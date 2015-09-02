@@ -1,4 +1,4 @@
-YARF: Yet Another REST (micro)Framework
+YARF: Yet Another REST Framework
 =======================================
 
 YARF is a micro-framework designed to build REST APIs and web services in a fast and simple way. 
@@ -18,7 +18,39 @@ The first release of the version 0.1 should be a working framework with a tiny s
 Code
 ----
 
-(TODO: Code example)
+Here's a transcription from our examples/simple package. 
+This is a very simple Hello World web application example. 
+
+
+```
+package main
+
+import (
+    "github.com/leonelquinteros/yarf"
+)
+
+// Define a simple resource
+type Hello struct {
+    yarf.Resource
+}
+
+// Implement the GET method
+func (h *Hello) Get() error {
+    h.Render("Hello world!")
+    
+    return nil
+}
+
+// Run app server
+func main() {
+    y := yarf.New(nil)
+    
+    y.Add("/", new(Hello))
+    
+    y.Start()
+}
+
+```
  
 
 Features
