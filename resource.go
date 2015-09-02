@@ -2,13 +2,12 @@ package yarf
 
 import ()
 
-/*
-	The Resource type is the representation of each REST resource of the application.
-	It implements the RestResource interface by default and allow the developer to extend the methods needed.
-	All resources being used by a YARF application have to composite this Resource struct.
-*/
+
+// The Resource type is the representation of each REST resource of the application.
+// It implements the RestResource interface by default and allow the developer to extend the methods needed.
+// All resources being used by a YARF application have to composite this Resource struct.
 type Resource struct {
-	Context *Context // Include the request context as a property of the Resource.
+    Context *Context // Include the request context as a property of the Resource.
 }
 
 // Context getter
@@ -31,11 +30,11 @@ func (r *Resource) Status(code int) {
 	r.Context.responseStatusCode = code
 }
 
-/*
-	Implementations for all HTTP methods.
-	The default implementation will return a 405 HTTP error indicating that the method isn't allowed.
-	Once a resource composites the Resource type, it will implement/overwrite the methods needed.
-*/
+
+// Implementations for all HTTP methods.
+// The default implementation will return a 405 HTTP error indicating that the method isn't allowed.
+// Once a resource composites the Resource type, it will implement/overwrite the methods needed.
+
 // HTTP GET
 func (r *Resource) Get() error {
 	return MethodNotImplementedError()
@@ -76,11 +75,9 @@ func (r *Resource) Connect() error {
 	return MethodNotImplementedError()
 }
 
-/*
-	The RestResource interface defines how Resources through the application have to be defined.
-	Ideally, the developer will composite the Resource struct into their own resources,
-	but it's possible to implement each one by their own.
-*/
+// The RestResource interface defines how Resources through the application have to be defined.
+// Ideally, the developer will composite the Resource struct into their own resources,
+// but it's possible to implement each one by their own.
 type RestResource interface {
 	// HTTP methods
 	Get() error

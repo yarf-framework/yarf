@@ -5,11 +5,10 @@ import (
 	"time"
 )
 
-/*
-	The Server struct wraps the net/http Server object.
-	It's the main point for the framework and it centralizes most of the request functionality.
-	All YARF configuration actions are handled by the server.
-*/
+
+// The Server struct wraps the net/http Server object.
+// It's the main point for the framework and it centralizes most of the request functionality.
+// All YARF configuration actions are handled by the server.
 type Server struct {
 	httpServer *http.Server // http.Server container
 
@@ -54,55 +53,55 @@ func (s *Server) AddAfter(r *RestResource) {
 }
 
 // ServeHTTP Implements http.Handler interface into Server.
-// Initializes a Context object and handles middleware and route actions. 
+// Initializes a Context object and handles middleware and route actions.
 // If an error is returned by any of the actions, the flow is stopped and a response is sent.
 func (s *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-    var err error
-    
-    // Set initial context data. 
-    // The Context pointer will be affected by the middleware and resources.
-    ctx := Context(req, res)
-    
+	var err error
+
+	// Set initial context data.
+	// The Context pointer will be affected by the middleware and resources.
+	ctx := Context(req, res)
+
 	// Pre-Dispatch Middleware
 	for _, m := range s.preDispatch {
 		err = m.PreDispatch(ctx)
 		if err != nil {
-		    // Return response on error
+			// Return response on error
 			s.Response(ctx, err)
 			return
 		}
 	}
-	
+
 	// Route dispatch
 	for _, r := range s.routes {
-	    if r.Match(req.URL.Path) {
-	        err = r.Dispatch(ctx)
-	        if err != nil {
-	            // Return response on error
+		if r.Match(req.URL.Path) {
+			err = r.Dispatch(ctx)
+			if err != nil {
+				// Return response on error
 				s.Response(ctx, err)
 				return
 			}
-	    }
+		}
 	}
-	
+
 	// Post-Dispatch Middleware
 	for _, m := range s.postDispatch {
 		err = m.PostDispatch(ctx)
 		if err != nil {
-		    // Return response on error
+			// Return response on error
 			s.Response(ctx, err)
 			return
 		}
 	}
-	
+
 	// Return response
 	s.Response(ctx, nil)
 }
 
-// Response writes the corresponding response to the HTTP response writer. 
-// It will handle the error status and the response body to be sent. 
+// Response writes the corresponding response to the HTTP response writer.
+// It will handle the error status and the response body to be sent.
 func (s *Server) Response(ctx *Context, e error) {
-    
+
 }
 
 // Start puts everything in place, sets http handlers and initiates a new http server.
@@ -114,5 +113,5 @@ func (s *Server) Start() {
 	s.httpServer.ListenAndServe()
 }
 
-// TODO: StartTLS() 
+// TODO: StartTLS()
 // Will start a HTTPS server based on previously configured TLS options and certs.
