@@ -1,7 +1,7 @@
 package yarf
 
 import (
-	"net/http"
+    "net/http"
 )
 
 // YarfError is the standard error response format used through the framework.

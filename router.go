@@ -3,6 +3,6 @@ package yarf
 import ()
 
 type Route struct {
-	path    string
-	handler *RestResource
+    path    string
+    handler *RestResource
 }

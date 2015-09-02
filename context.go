@@ -1,7 +1,7 @@
 package yarf
 
 import (
-	"net/http"
+    "net/http"
 )
 
 // Context is the data/status storage of every YARF request.
