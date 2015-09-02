@@ -41,7 +41,7 @@ func (h *Hello) Get() error {
     return nil
 }
 
-// Run app server
+// Run app server on http://localhost:8080
 func main() {
     y := yarf.New(nil)
     

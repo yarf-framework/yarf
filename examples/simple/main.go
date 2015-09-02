@@ -17,6 +17,7 @@ func (h *Hello) Get() error {
 }
 
 // Entry point of the executable application
+// It runs a default server listening on http://localhost:8080
 func main() {
 	// Create a new empty YARF server
 	y := yarf.New(nil)
