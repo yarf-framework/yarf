@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/leonelquinteros/yarf"
+	"github.com/yarf-framework/yarf"
 )
 
 // Entry point of the executable application
