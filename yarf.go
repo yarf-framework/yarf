@@ -12,9 +12,7 @@ const Version = "0.1b"
 type Yarf struct {
 	routes []*Route // Yarf routes
 
-	preDispatch []MiddlewareResource // Run-before middleware resources
-
-	postDispatch []MiddlewareResource // Run-after middleware resources
+	middleware []MiddlewareResource // Middleware resources
 }
 
 // Creates a new Yarf and returns a pointer to it.
@@ -31,14 +29,9 @@ func (y *Yarf) Add(url string, r RestResource) {
 	y.routes = append(y.routes, &Route{handler: r, path: url})
 }
 
-// AddBefore inserts a MiddlewareResource into the pre-dispatch middleware list
-func (y *Yarf) AddBefore(m MiddlewareResource) {
-	y.preDispatch = append(y.preDispatch, m)
-}
-
-// AddAfter inserts a MiddlewareResource into the post-dispatch middleware list
-func (y *Yarf) AddAfter(m MiddlewareResource) {
-	y.postDispatch = append(y.postDispatch, m)
+// Insert adds a MiddlewareResource middleware list
+func (y *Yarf) Insert(m MiddlewareResource) {
+	y.middleware = append(y.middleware, m)
 }
 
 // ServeHTTP Implements http.Handler interface into Yarf.
@@ -52,8 +45,12 @@ func (y *Yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	ctx := NewContext(req, res)
 
 	// Pre-Dispatch Middleware
-	for _, m := range y.preDispatch {
-		err = m.PreDispatch(ctx)
+	for _, m := range y.middleware {
+		// Add context to middleware
+		m.SetContext(ctx)
+
+		// Dispatch
+		err = m.PreDispatch()
 		if err != nil {
 			// Return response on error
 			y.Response(ctx, err)
@@ -74,8 +71,8 @@ func (y *Yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	}
 
 	// Post-Dispatch Middleware
-	for _, m := range y.postDispatch {
-		err = m.PostDispatch(ctx)
+	for _, m := range y.middleware {
+		err = m.PostDispatch()
 		if err != nil {
 			// Return response on error
 			y.Response(ctx, err)

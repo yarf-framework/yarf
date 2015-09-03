@@ -13,6 +13,8 @@ type Route struct {
 // Match returns true/false indicating if a request URL matches the route.
 // Route matchs are exact, that means, there are not optional parameters.
 // To implement optional parameters you can define different routes handled by the same RestResource.
+// When a route matches the request URL, this method will parse and fill
+// the parameters parsed during the process into the Context object.
 func (r *Route) Match(url string, c *Context) bool {
 	// Init params
 	params := make(map[string]string)
@@ -20,7 +22,7 @@ func (r *Route) Match(url string, c *Context) bool {
 	// Copy route path value
 	route := r.path
 
-	// Clean initial and trailing "/" from request and route.
+	// Clean initial and trailing "/" from request and routes
 	for strings.HasPrefix(route, "/") {
 		route = strings.TrimPrefix(route, "/")
 	}
@@ -36,10 +38,10 @@ func (r *Route) Match(url string, c *Context) bool {
 
 	// Split parts
 	routeParts := strings.Split(route, "/")
-	pathParts := strings.Split(url, "/")
+	urlParts := strings.Split(url, "/")
 
 	// YARF router only accepts exact route matches, so check for part count.
-	if len(pathParts) != len(routeParts) {
+	if len(urlParts) != len(routeParts) {
 		return false
 	}
 
@@ -47,18 +49,18 @@ func (r *Route) Match(url string, c *Context) bool {
 	if route != url {
 		for i, r := range routeParts {
 			// Check part
-			if r != pathParts[i] && r != "" && r[:1] != ":" {
+			if r != urlParts[i] && r != "" && r[:1] != ":" {
 				return false
 			}
 
 			// Check param
 			if r != "" && r[:1] == ":" {
 				// Empty params aren't params
-				if pathParts[i] == "" {
+				if urlParts[i] == "" {
 					return false
 				}
 
-				params[r[1:]] = pathParts[i]
+				params[r[1:]] = urlParts[i]
 			}
 		}
 	}
@@ -71,7 +73,7 @@ func (r *Route) Match(url string, c *Context) bool {
 }
 
 // Dispatch executes the right RestResource method based on the HTTP request in the Context object.
-// Accepts method override, based on request header, only from PUT/PATCH/DELETE to POST.
+// Accepts method override, based on request header: X-HTTP-Method-Override
 func (r *Route) Dispatch(c *Context) error {
 	// Init error status
 	var err error
@@ -80,15 +82,12 @@ func (r *Route) Dispatch(c *Context) error {
 	method := strings.ToUpper(c.Request.Method)
 
 	// Check for method overriding
-	if method == "POST" {
-		mo := strings.ToUpper(c.Request.Header.Get("X-HTTP-Method-Override"))
-
-		if mo == "PUT" || mo == "PATCH" || mo == "DELETE" {
-			method = mo
-		}
+	mo := strings.ToUpper(c.Request.Header.Get("X-HTTP-Method-Override"))
+	if mo == "PUT" || mo == "PATCH" || mo == "DELETE" {
+		method = mo
 	}
 
-	// Set Context
+	// Add Context to handler
 	r.handler.SetContext(c)
 
 	// Method dispatch

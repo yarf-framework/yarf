@@ -3,25 +3,10 @@ package yarf
 import ()
 
 // The Resource type is the representation of each REST resource of the application.
-// It implements the RestResource interface by default and allow the developer to extend the methods needed.
+// It implements the RestResource interface and allows the developer to extend the methods needed.
 // All resources being used by a YARF application have to composite this Resource struct.
 type Resource struct {
-	Context *Context // Include the request context as a property of the Resource.
-}
-
-// Context setter
-func (r *Resource) SetContext(c *Context) {
-	r.Context = c
-}
-
-// Render takes a string and aggregates it to the Context.responseContent.
-func (r *Resource) Render(content string) {
-	r.Context.responseContent += content
-}
-
-// Status sets the HTTP status code to be returned on the response.
-func (r *Resource) Status(code int) {
-	r.Context.responseStatus = code
+	RequestContext
 }
 
 // Implementations for all HTTP methods.
@@ -88,6 +73,6 @@ type RestResource interface {
 	Trace() error
 	Connect() error
 
-	// Context setter/getter methods
+	// Context setter
 	SetContext(*Context)
 }

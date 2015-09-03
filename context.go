@@ -32,6 +32,28 @@ func NewContext(r *http.Request, rw http.ResponseWriter) *Context {
 	c.Request = r
 	c.Response = rw
 	c.responseStatus = 200
+	c.Params = url.Values{}
 
 	return c
+}
+
+// RequestContext implements Context related methods to interact with the Context object.
+// It's also used to composite into Resource and Middleware to satisfy the interfaces.
+type RequestContext struct {
+	Context *Context
+}
+
+// Context setter
+func (rc *RequestContext) SetContext(c *Context) {
+	rc.Context = c
+}
+
+// Render takes a string and aggregates it to the Context.responseContent.
+func (rc *RequestContext) Render(content string) {
+	rc.Context.responseContent += content
+}
+
+// Status sets the HTTP status code to be returned on the response.
+func (rc *RequestContext) Status(code int) {
+	rc.Context.responseStatus = code
 }

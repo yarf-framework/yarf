@@ -65,10 +65,11 @@ For more code and examples demonstrating all YARF features, please refer to the 
 
 Features that are planned to be implemented soon.
 
-- Framework Tests
-- Framework Benchmarks
-- Middleware support at Resource level
+- Framework Tests.
+- Framework Benchmarks.
+- Middleware support at Resource level.
 - Middleware and Lib packages with extra/useful functionality to add to any web application.
+- Gzip responses.
 
 
 ## Contribute
