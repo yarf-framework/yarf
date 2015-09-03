@@ -51,7 +51,9 @@ func main() {
 }
 
 ```
- 
+
+For more code and examples demonstrating all YARF features, please refer to the 'examples' directory.
+
 
 Features
 --------
