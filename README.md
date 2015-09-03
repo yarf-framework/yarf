@@ -7,7 +7,7 @@ Designed after Go's composition features, takes a new approach to write simple a
 
 ## Version
 
-Current version is: *0.1b*
+Current version is: **0.1b**
 
 The project is still in development and probably not working, but growing step by step into a functional framework.
 The first release of the version 0.1 should be a working framework with a tiny set of basic features.
@@ -73,7 +73,7 @@ Features that are planned to be implemented soon.
 
 ## Contribute
 
-*Yes, please!*
+**Yes, please!**
 
 - Use and test YARF and/or packages included.
 - Implement new web applications based on Yarf.
