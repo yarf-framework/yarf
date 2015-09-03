@@ -4,6 +4,9 @@ import (
 	"net/http"
 )
 
+// Framework version string
+const Version = "0.1b"
+
 // Yarf is the main entry point for the framework and it centralizes most of the functionality.
 // All YARF configuration actions are handled by the Yarf.
 type Yarf struct {
