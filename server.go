@@ -2,15 +2,12 @@ package yarf
 
 import (
 	"net/http"
-	"time"
 )
 
 // The Server struct wraps the net/http Server object.
 // It's the main point for the framework and it centralizes most of the request functionality.
 // All YARF configuration actions are handled by the server.
 type Server struct {
-	httpServer *http.Server // http.Server container
-
 	routes []*Route // Server routes
 
 	preDispatch []MiddlewareResource // Run-before middleware resources
@@ -19,22 +16,11 @@ type Server struct {
 }
 
 // Creates a new server and returns a pointer to it.
-// It receives a net/http Server to be used. If nil, a default server will be initiated.
-func New(srv *http.Server) *Server {
+// Performs needed initializations
+func New() *Server {
 	s := new(Server)
 
-	// If http.Server is nil, lets start with a default server configuration
-	if srv == nil {
-		srv = &http.Server{
-			Addr:         ":8080",
-			Handler:      nil,
-			ReadTimeout:  time.Duration(10) * time.Second,
-			WriteTimeout: time.Duration(10) * time.Second,
-		}
-	}
-
-	s.httpServer = srv
-
+	// No initialization routines yet...
 	return s
 }
 
@@ -114,14 +100,16 @@ func (s *Server) Response(c *Context, err error) {
 	c.Response.Write([]byte(c.responseContent))
 }
 
-// Start puts everything in place, sets http handlers and initiates a new http server.
-func (s *Server) Start() {
-	// Handle every request.
-	http.Handle("/", s)
-
+// Start initiates a new http server and start listening.
+// It's a wrapper for http.ListenAndServe(addr, router)
+func (s *Server) Start(address string) {
 	// Run
-	s.httpServer.ListenAndServe()
+	http.ListenAndServe(address, s)
 }
 
-// TODO: StartTLS()
-// Will start a HTTPS server based on previously configured TLS options and certs.
+// StartTLS initiats a new http server and starts listening and HTTPS requests.
+// It is a shortcut for http.ListenAndServeTLS(address, cert, key, Server)
+func (s *Server) StartTLS(address, cert, key string) {
+	// Run
+	http.ListenAndServeTLS(address, cert, key, s)
+}

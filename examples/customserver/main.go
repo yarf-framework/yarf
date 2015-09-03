@@ -22,7 +22,7 @@ func (h *Hello) Get() error {
 // This time we setup a custom Go http server and use YARF as a router.
 func main() {
 	// Create a new empty YARF server
-	y := yarf.New(nil)
+	y := yarf.New()
 
 	// Add route/resource
 	y.Add("/", new(Hello))

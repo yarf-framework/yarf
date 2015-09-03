@@ -20,11 +20,11 @@ func (h *Hello) Get() error {
 // It runs a default server listening on http://localhost:8080
 func main() {
 	// Create a new empty YARF server
-	y := yarf.New(nil)
+	y := yarf.New()
 
 	// Add route/resource
 	y.Add("/", new(Hello))
 
-	// Start server
-	y.Start()
+	// Start server listening on port 8080
+	y.Start(":8080")
 }
