@@ -4,45 +4,44 @@ import (
 	"net/http"
 )
 
-// The Server struct wraps the net/http Server object.
-// It's the main point for the framework and it centralizes most of the request functionality.
-// All YARF configuration actions are handled by the server.
-type Server struct {
-	routes []*Route // Server routes
+// Yarf is the main entry point for the framework and it centralizes most of the functionality.
+// All YARF configuration actions are handled by the Yarf.
+type Yarf struct {
+	routes []*Route // Yarf routes
 
 	preDispatch []MiddlewareResource // Run-before middleware resources
 
 	postDispatch []MiddlewareResource // Run-after middleware resources
 }
 
-// Creates a new server and returns a pointer to it.
+// Creates a new Yarf and returns a pointer to it.
 // Performs needed initializations
-func New() *Server {
-	s := new(Server)
+func New() *Yarf {
+	y := new(Yarf)
 
 	// No initialization routines yet...
-	return s
+	return y
 }
 
 // Add inserts a new resource with it's associated route.
-func (s *Server) Add(url string, r RestResource) {
-	s.routes = append(s.routes, &Route{handler: r, path: url})
+func (y *Yarf) Add(url string, r RestResource) {
+	y.routes = append(y.routes, &Route{handler: r, path: url})
 }
 
 // AddBefore inserts a MiddlewareResource into the pre-dispatch middleware list
-func (s *Server) AddBefore(m MiddlewareResource) {
-	s.preDispatch = append(s.preDispatch, m)
+func (y *Yarf) AddBefore(m MiddlewareResource) {
+	y.preDispatch = append(y.preDispatch, m)
 }
 
 // AddAfter inserts a MiddlewareResource into the post-dispatch middleware list
-func (s *Server) AddAfter(m MiddlewareResource) {
-	s.postDispatch = append(s.postDispatch, m)
+func (y *Yarf) AddAfter(m MiddlewareResource) {
+	y.postDispatch = append(y.postDispatch, m)
 }
 
-// ServeHTTP Implements http.Handler interface into Server.
+// ServeHTTP Implements http.Handler interface into Yarf.
 // Initializes a Context object and handles middleware and route actions.
 // If an error is returned by any of the actions, the flow is stopped and a response is sent.
-func (s *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (y *Yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	var err error
 
 	// Set initial context data.
@@ -50,44 +49,44 @@ func (s *Server) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	ctx := NewContext(req, res)
 
 	// Pre-Dispatch Middleware
-	for _, m := range s.preDispatch {
+	for _, m := range y.preDispatch {
 		err = m.PreDispatch(ctx)
 		if err != nil {
 			// Return response on error
-			s.Response(ctx, err)
+			y.Response(ctx, err)
 			return
 		}
 	}
 
 	// Route dispatch
-	for _, r := range s.routes {
+	for _, r := range y.routes {
 		if r.Match(req.URL.Path, ctx) {
 			err = r.Dispatch(ctx)
 			if err != nil {
 				// Return response on error
-				s.Response(ctx, err)
+				y.Response(ctx, err)
 				return
 			}
 		}
 	}
 
 	// Post-Dispatch Middleware
-	for _, m := range s.postDispatch {
+	for _, m := range y.postDispatch {
 		err = m.PostDispatch(ctx)
 		if err != nil {
 			// Return response on error
-			s.Response(ctx, err)
+			y.Response(ctx, err)
 			return
 		}
 	}
 
 	// Return response
-	s.Response(ctx, nil)
+	y.Response(ctx, nil)
 }
 
 // Response writes the corresponding response to the HTTP response writer.
 // It will handle the error status and the response body to be sent.
-func (s *Server) Response(c *Context, err error) {
+func (y *Yarf) Response(c *Context, err error) {
 	// Error handling
 	if err != nil {
 
@@ -100,16 +99,16 @@ func (s *Server) Response(c *Context, err error) {
 	c.Response.Write([]byte(c.responseContent))
 }
 
-// Start initiates a new http server and start listening.
+// Start initiates a new http Yarf and start listening.
 // It's a wrapper for http.ListenAndServe(addr, router)
-func (s *Server) Start(address string) {
+func (y *Yarf) Start(address string) {
 	// Run
-	http.ListenAndServe(address, s)
+	http.ListenAndServe(address, y)
 }
 
-// StartTLS initiats a new http server and starts listening and HTTPS requests.
-// It is a shortcut for http.ListenAndServeTLS(address, cert, key, Server)
-func (s *Server) StartTLS(address, cert, key string) {
+// StartTLS initiats a new http Yarf and starts listening and HTTPS requests.
+// It is a shortcut for http.ListenAndServeTLS(address, cert, key, Yarf)
+func (y *Yarf) StartTLS(address, cert, key string) {
 	// Run
-	http.ListenAndServeTLS(address, cert, key, s)
+	http.ListenAndServeTLS(address, cert, key, y)
 }
