@@ -57,3 +57,8 @@ func (rc *RequestContext) Render(content string) {
 func (rc *RequestContext) Status(code int) {
 	rc.Context.responseStatus = code
 }
+
+// Param is a wrapper for rc.Context.Params.Get()
+func (rc *RequestContext) Param(name string) string {
+	return rc.Context.Params.Get(name)
+}

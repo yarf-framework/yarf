@@ -10,7 +10,7 @@ type Hello struct {
 
 // Implement the GET handler with optional name parameter
 func (h *Hello) Get() error {
-	name := h.Context.Params.Get("name")
+	name := h.Param("name")
 
 	salute := "Hello"
 	if name != "" {
