@@ -6,7 +6,6 @@ Designed after Go's composition features, takes a new approach to write simple a
 
 
 ## Version
-----------
 
 Current version is: *0.1b*
 
@@ -15,7 +14,6 @@ The first release of the version 0.1 should be a working framework with a tiny s
 
 
 ## Code
--------
 
 Here's a transcription from our examples/simple package. 
 This is a very simple Hello World web application example. 
@@ -53,7 +51,6 @@ For more code and examples demonstrating all YARF features, please refer to the 
 
 
 ## Features
------------
 
 #### v0.1
 
@@ -65,7 +62,6 @@ For more code and examples demonstrating all YARF features, please refer to the 
 
 
 ## Future
-------
 
 Features that are planned to be implemented soon.
 
@@ -76,7 +72,6 @@ Features that are planned to be implemented soon.
 
 
 ## Contribute
-----------
 
 *Yes, please!*
 
