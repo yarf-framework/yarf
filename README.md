@@ -11,9 +11,6 @@ Designed after Go's composition features, takes a new approach to write simple a
 
 Current version is: **0.2**
 
-The project is still in development and probably not working, but growing step by step into a functional framework.
-The first release of the version 0.1 should be a working framework with a tiny set of basic features.
-
 
 ## Documentation
 
