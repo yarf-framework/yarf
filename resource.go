@@ -32,47 +32,47 @@ type Resource struct {
 // The default implementation will return a 405 HTTP error indicating that the method isn't allowed.
 // Once a resource composites the Resource type, it will implement/overwrite the methods needed.
 
-// HTTP GET
+// Default HTTP GET implementation
 func (r *Resource) Get() error {
 	return ErrorMethodNotImplemented()
 }
 
-// HTTP POST
+// Default HTTP POST implementation
 func (r *Resource) Post() error {
 	return ErrorMethodNotImplemented()
 }
 
-// HTTP PUT
+// Default HTTP PUT implementation
 func (r *Resource) Put() error {
 	return ErrorMethodNotImplemented()
 }
 
-// HTTP PATCH
+// Default HTTP PATCH implementation
 func (r *Resource) Patch() error {
 	return ErrorMethodNotImplemented()
 }
 
-// HTTP DELETE
+// Default HTTP DELETE implementation
 func (r *Resource) Delete() error {
 	return ErrorMethodNotImplemented()
 }
 
-// HTTP OPTIONS
+// Default HTTP OPTIONS implementation
 func (r *Resource) Options() error {
 	return ErrorMethodNotImplemented()
 }
 
-// HTTP HEAD
+// Default HTTP HEAD implementation
 func (r *Resource) Head() error {
 	return ErrorMethodNotImplemented()
 }
 
-// HTTP TRACE
+// Default HTTP TRACE
 func (r *Resource) Trace() error {
 	return ErrorMethodNotImplemented()
 }
 
-// HTTP CONNECT
+// Default HTTP CONNECT
 func (r *Resource) Connect() error {
 	return ErrorMethodNotImplemented()
 }

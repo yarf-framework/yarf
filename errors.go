@@ -27,22 +27,27 @@ func (e *CustomError) Error() string {
 	return e.errorMsg
 }
 
+// Returns the error's HTTP code to be used in the response.
 func (e *CustomError) Code() int {
 	return e.httpCode
 }
 
+// Returns the error's ID for further reference.
 func (e *CustomError) Id() int {
 	return e.errorCode
 }
 
+// Returns the error's message, used to implement the Error interface.
 func (e *CustomError) Msg() string {
 	return e.errorMsg
 }
 
+// Returns the error's content body, if needed, to be returned in the HTTP response.
 func (e *CustomError) Body() string {
 	return e.errorBody
 }
 
+// UnexpectedError is used when the origin of the error can't be discovered
 type UnexpectedError struct {
 	CustomError
 }
@@ -57,6 +62,7 @@ func ErrorUnexpected() *UnexpectedError {
 	return e
 }
 
+// MethodNotImplementedError is used to communicate that a specific HTTP method isn't implemented by a resource.
 type MethodNotImplementedError struct {
 	CustomError
 }
@@ -71,6 +77,7 @@ func ErrorMethodNotImplemented() *MethodNotImplementedError {
 	return e
 }
 
+// NotFoundError is the HTTP 404 error equivalent.
 type NotFoundError struct {
 	CustomError
 }

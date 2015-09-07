@@ -20,7 +20,11 @@ type route struct {
 	handler ResourceHandler // Handler for the route
 }
 
-// Route is the constructor for the route struct
+// Route returns a new route object initialized with the provided data.
+// Params:
+//	- url string 		// The route path to handle
+//	- h	ResourceHandler	// The ResourceHandler object that will process the requests to the url.
+//
 func Route(url string, h ResourceHandler) *route {
 	r := new(route)
 	r.path = url
@@ -99,14 +103,14 @@ func (r *route) Match(url string, c *Context) bool {
 }
 
 // Dispatch executes the right ResourceHandler method based on the HTTP request in the Context object.
-// Accepts method override, based on request header: X-HTTP-Method-Override
+// Accepts HTTP method override, based on request header: X-HTTP-Method-Override
 func (r *route) Dispatch(c *Context) (err error) {
 	// Get HTTP method requested
 	method := strings.ToUpper(c.Request.Method)
 
 	// Check for method overriding
 	mo := strings.ToUpper(c.Request.Header.Get("X-HTTP-Method-Override"))
-	if mo == "PUT" || mo == "PATCH" || mo == "DELETE" {
+	if mo != "" {
 		method = mo
 	}
 
@@ -148,10 +152,6 @@ func (r *route) Dispatch(c *Context) (err error) {
 }
 
 // routeGroup stores routes grouped under a single url prefix.
-// Implements Router interface to being able to handle groups as routes.
-// Groups can be nested into each other,
-// so it's possible to add a routeGroup as a route inside another routeGroup.
-// Includes methods to work with middleware.
 type routeGroup struct {
 	prefix string // The url prefix path for all routes in the group
 
@@ -164,7 +164,11 @@ type routeGroup struct {
 	lastMatch Router // Stores last matched route to be dispatched.
 }
 
-// RouteGroup is the constructor for the routeGroup object
+// RouteGroup creates a new routeGroup object and initializes it with the provided url prefix.
+// The object implements Router interface to being able to handle groups as routes.
+// Groups can be nested into each other,
+// so it's possible to add a routeGroup as a route inside another routeGroup.
+// Includes methods to work with middleware.
 func RouteGroup(url string) *routeGroup {
 	r := new(routeGroup)
 	r.prefix = url
@@ -290,18 +294,18 @@ func (g *routeGroup) Dispatch(c *Context) (err error) {
 	return
 }
 
-// Add inserts a new resource with it's associated route.
+// Add inserts a new resource with it's associated route into the group object.
 func (g *routeGroup) Add(url string, h ResourceHandler) {
 	g.routes = append(g.routes, Route(url, h))
 }
 
-// AddGroup inserts a route group into the routes list.
+// AddGroup inserts a route group into the routes list of the group object.
 // This makes possible to nest groups.
 func (g *routeGroup) AddGroup(r *routeGroup) {
 	g.routes = append(g.routes, r)
 }
 
-// Insert adds a MiddlewareHandler into the middleware list
+// Insert adds a MiddlewareHandler into the middleware list of the group object.
 func (g *routeGroup) Insert(m MiddlewareHandler) {
 	g.middleware = append(g.middleware, m)
 }
