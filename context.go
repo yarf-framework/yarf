@@ -25,8 +25,7 @@ type Context struct {
 	responseContent string
 }
 
-// Context constructor.
-// Instantiates a new *Context object with default values and returns it.
+// NewContext instantiates a new *Context object with default values and returns it.
 func NewContext(r *http.Request, rw http.ResponseWriter) *Context {
 	c := new(Context)
 	c.Request = r
@@ -43,7 +42,7 @@ type RequestContext struct {
 	Context *Context
 }
 
-// Context setter
+// SetContext setter
 func (rc *RequestContext) SetContext(c *Context) {
 	rc.Context = c
 }

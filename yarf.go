@@ -15,7 +15,7 @@ type yarf struct {
 	middleware []MiddlewareHandler // Middleware resources
 }
 
-// Creates a new yarf and returns a pointer to it.
+// Yarf creates a new yarf and returns a pointer to it.
 // Performs needed initializations
 func Yarf() *yarf {
 	y := new(yarf)
@@ -97,13 +97,13 @@ func (y *yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 func (y *yarf) Response(c *Context, err error) {
 	// Error handling
 	if err != nil {
-		if _, ok := err.(YarfError); !ok {
+		if _, ok := err.(YError); !ok {
 			err = ErrorUnexpected()
 		}
 
 		// Replace context content with error data.
-		c.responseStatus = err.(YarfError).Code()
-		c.responseContent = err.(YarfError).Body()
+		c.responseStatus = err.(YError).Code()
+		c.responseContent = err.(YError).Body()
 	}
 
 	// Write HTTP status

@@ -241,11 +241,11 @@ func (g *routeGroup) Match(url string, c *Context) bool {
 	}
 
 	// Remove prefix part form the request URL
-	rUrl := strings.Join(urlParts[len(routeParts):], "/")
+	rURL := strings.Join(urlParts[len(routeParts):], "/")
 
 	// Now look for a match inside the routes collection
 	for _, r := range g.routes {
-		if r.Match(rUrl, c) {
+		if r.Match(rURL, c) {
 			// If a match is found, store the lastMatch and return true.
 			g.lastMatch = r
 			return true

@@ -4,16 +4,16 @@ import (
 	"net/http"
 )
 
-// YarfError is the interface used to handle error responses inside the framework.
-type YarfError interface {
+// YError is the interface used to handle error responses inside the framework.
+type YError interface {
 	Code() int    // HTTP response code for this error
-	Id() int      // Error code ID.
+	ID() int      // Error code ID.
 	Msg() string  // Error description
 	Body() string // Error body content to be returned to the client if needed.
 }
 
 // CustomError is the standard error response format used through the framework.
-// Implements Error and YarfError interfaces
+// Implements Error and YError interfaces
 // All custom errors should composite the CustomError in order to let know the framework what to do with each one.
 type CustomError struct {
 	httpCode  int    // HTTP status code to be used as this error response.
@@ -27,22 +27,22 @@ func (e *CustomError) Error() string {
 	return e.errorMsg
 }
 
-// Returns the error's HTTP code to be used in the response.
+// Code returns the error's HTTP code to be used in the response.
 func (e *CustomError) Code() int {
 	return e.httpCode
 }
 
-// Returns the error's ID for further reference.
-func (e *CustomError) Id() int {
+// ID returns the error's ID for further reference.
+func (e *CustomError) ID() int {
 	return e.errorCode
 }
 
-// Returns the error's message, used to implement the Error interface.
+// Msg returns the error's message, used to implement the Error interface.
 func (e *CustomError) Msg() string {
 	return e.errorMsg
 }
 
-// Returns the error's content body, if needed, to be returned in the HTTP response.
+// Body returns the error's content body, if needed, to be returned in the HTTP response.
 func (e *CustomError) Body() string {
 	return e.errorBody
 }
@@ -52,6 +52,7 @@ type UnexpectedError struct {
 	CustomError
 }
 
+// ErrorUnexpected creates UnexpectedError
 func ErrorUnexpected() *UnexpectedError {
 	e := new(UnexpectedError)
 
@@ -67,6 +68,7 @@ type MethodNotImplementedError struct {
 	CustomError
 }
 
+// ErrorMethodNotImplemented creates MethodNotImplementedError
 func ErrorMethodNotImplemented() *MethodNotImplementedError {
 	e := new(MethodNotImplementedError)
 
@@ -82,6 +84,7 @@ type NotFoundError struct {
 	CustomError
 }
 
+// ErrorNotFound creates NotFoundError
 func ErrorNotFound() *NotFoundError {
 	e := new(NotFoundError)
 

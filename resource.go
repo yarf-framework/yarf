@@ -32,47 +32,56 @@ type Resource struct {
 // The default implementation will return a 405 HTTP error indicating that the method isn't allowed.
 // Once a resource composites the Resource type, it will implement/overwrite the methods needed.
 
-// Default HTTP GET implementation
+// Get is the default HTTP GET implementation.
+// It returns a NotImplementedError
 func (r *Resource) Get() error {
 	return ErrorMethodNotImplemented()
 }
 
-// Default HTTP POST implementation
+// Post is the default HTTP POST implementation.
+// It returns a NotImplementedError
 func (r *Resource) Post() error {
 	return ErrorMethodNotImplemented()
 }
 
-// Default HTTP PUT implementation
+// Put is the default HTTP PUT implementation.
+// It returns a NotImplementedError
 func (r *Resource) Put() error {
 	return ErrorMethodNotImplemented()
 }
 
-// Default HTTP PATCH implementation
+// Patch is the default HTTP PATCH implementation.
+// It returns a NotImplementedError
 func (r *Resource) Patch() error {
 	return ErrorMethodNotImplemented()
 }
 
-// Default HTTP DELETE implementation
+// Delete is the default HTTP DELETE implementation.
+// It returns a NotImplementedError
 func (r *Resource) Delete() error {
 	return ErrorMethodNotImplemented()
 }
 
-// Default HTTP OPTIONS implementation
+// Options is the default HTTP OPTIONS implementation.
+// It returns a NotImplementedError
 func (r *Resource) Options() error {
 	return ErrorMethodNotImplemented()
 }
 
-// Default HTTP HEAD implementation
+// Head is the default HTTP HEAD implementation.
+// It returns a NotImplementedError
 func (r *Resource) Head() error {
 	return ErrorMethodNotImplemented()
 }
 
-// Default HTTP TRACE
+// Trace is the default HTTP TRACE implementation.
+// It returns a NotImplementedError
 func (r *Resource) Trace() error {
 	return ErrorMethodNotImplemented()
 }
 
-// Default HTTP CONNECT
+// Connect is the default HTTP CONNECT implementation.
+// It returns a NotImplementedError
 func (r *Resource) Connect() error {
 	return ErrorMethodNotImplemented()
 }
