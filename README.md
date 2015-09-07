@@ -15,7 +15,7 @@ The first release of the version 0.1 should be a working framework with a tiny s
 
 ## Documentation
 
-[https://godoc.org/github.com/yarf-framework/yarf]
+https://godoc.org/github.com/yarf-framework/yarf
 
 
 ## Code
