@@ -7,7 +7,7 @@ Designed after Go's composition features, takes a new approach to write simple a
 
 ## Version
 
-Current version is: **0.1b**
+Current version is: **0.2**
 
 The project is still in development and probably not working, but growing step by step into a functional framework.
 The first release of the version 0.1 should be a working framework with a tiny set of basic features.
@@ -52,12 +52,13 @@ For more code and examples demonstrating all YARF features, please refer to the 
 
 ## Features
 
-#### v0.1
+#### v0.2
 
 - Resource based design, each resource can implement one or all HTTP methods needed (GET, POST, DELETE, etc.).
 - Simple router matches exact URLs against resources. The routes supports params in the form /:param.
 - Support for optional parameters defining multiple routes against the same Resource.
 - Middleware support at router level. All routes (and methods) will be pre-filtered and post-filtered by Middleware handlers.
+- Route groups. Routes can be grouped into a route prefix and handle their own middleware.
 
 
 

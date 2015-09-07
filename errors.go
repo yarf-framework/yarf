@@ -6,10 +6,10 @@ import (
 
 // YarfError is the interface used to handle error responses inside the framework.
 type YarfError interface {
-    Code() int		// HTTP response code for this error
-    Id()   int		// Error code ID.
-    Msg()  string	// Error description
-    Body() string   // Error body content to be returned to the client if needed.
+	Code() int    // HTTP response code for this error
+	Id() int      // Error code ID.
+	Msg() string  // Error description
+	Body() string // Error body content to be returned to the client if needed.
 }
 
 // CustomError is the standard error response format used through the framework.
@@ -28,24 +28,25 @@ func (e *CustomError) Error() string {
 }
 
 func (e *CustomError) Code() int {
-    return e.httpCode
+	return e.httpCode
 }
 
 func (e *CustomError) Id() int {
-    return e.errorCode
+	return e.errorCode
 }
 
 func (e *CustomError) Msg() string {
-    return e.errorMsg
+	return e.errorMsg
 }
 
 func (e *CustomError) Body() string {
-    return e.errorBody
+	return e.errorBody
 }
 
 type UnexpectedError struct {
 	CustomError
 }
+
 func ErrorUnexpected() *UnexpectedError {
 	e := new(UnexpectedError)
 
@@ -59,6 +60,7 @@ func ErrorUnexpected() *UnexpectedError {
 type MethodNotImplementedError struct {
 	CustomError
 }
+
 func ErrorMethodNotImplemented() *MethodNotImplementedError {
 	e := new(MethodNotImplementedError)
 
@@ -72,6 +74,7 @@ func ErrorMethodNotImplemented() *MethodNotImplementedError {
 type NotFoundError struct {
 	CustomError
 }
+
 func ErrorNotFound() *NotFoundError {
 	e := new(NotFoundError)
 

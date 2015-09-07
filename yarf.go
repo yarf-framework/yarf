@@ -5,7 +5,7 @@ import (
 )
 
 // Framework version string
-const Version = "0.1b"
+const Version = "0.2"
 
 // yarf is the main entry point for the framework and it centralizes most of the functionality.
 // All YARF configuration actions are handled by the yarf.
@@ -98,9 +98,9 @@ func (y *yarf) Response(c *Context, err error) {
 	// Error handling
 	if err != nil {
 		if _, ok := err.(YarfError); !ok {
-		    err = ErrorUnexpected()
+			err = ErrorUnexpected()
 		}
-		
+
 		// Replace context content with error data.
 		c.responseStatus = err.(YarfError).Code()
 		c.responseContent = err.(YarfError).Body()
