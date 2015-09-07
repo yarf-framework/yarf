@@ -1,36 +1,36 @@
 /*
 Package yarf (Yet Another Rest Framework) provides the foundations to write REST APIs in a fast and simple way.
 
-This is a full YARF "Hello World" example: 
+This is a full YARF "Hello World" example:
 
 	package main
-	
+
 	import (
 	    "github.com/yarf-framework/yarf"
 	)
-	
+
 	// Define a simple resource
 	type Hello struct {
 	    yarf.Resource
 	}
-	
+
 	// Implement the GET method
 	func (h *Hello) Get() error {
 	    h.Render("Hello world!")
-	    
+
 	    return nil
 	}
-	
+
 	// Run app server on http://localhost:8080
 	func main() {
 	    y := yarf.Yarf()
 	    y.Add("/", new(Hello))
 	    y.Start(":8080")
 	}
-	
 
 
-Basic features: 
+
+Basic features:
 
 - Resource based design: Each resource can implement one, several or all HTTP methods needed (GET, POST, DELETE, etc.).
 
@@ -51,3 +51,5 @@ Basic features:
 
 
 */
+
+package yarf
