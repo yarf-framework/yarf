@@ -9,7 +9,7 @@ import (
 
 func BenchmarkSimpleRequest(b *testing.B) {
 	// Replicate main.go setup
-	y := yarf.New()
+	y := yarf.Yarf()
 	y.Add("/", new(Hello))
 
 	// Create request/response

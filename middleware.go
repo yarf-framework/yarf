@@ -2,10 +2,10 @@ package yarf
 
 import ()
 
-// MiddlewareResource interface provides the methods for request filters
+// MiddlewareHandler interface provides the methods for request filters
 // that needs to run before, or after, every request Resource is executed.
 // Both methods receives a Context pointer in case the middleware needs to modify Context data.
-type MiddlewareResource interface {
+type MiddlewareHandler interface {
 	PreDispatch() error
 	PostDispatch() error
 	SetContext(*Context)
@@ -13,7 +13,7 @@ type MiddlewareResource interface {
 
 // Middleware struct is the default implementation of a Middleware and does nothing.
 // Users can either implement both methods or composite this struct into their own.
-// Both methods needs to be present to satisfy the MiddlewareResource interface.
+// Both methods needs to be present to satisfy the MiddlewareHandler interface.
 type Middleware struct {
 	RequestContext
 }

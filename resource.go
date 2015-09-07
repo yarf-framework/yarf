@@ -2,8 +2,27 @@ package yarf
 
 import ()
 
+// The ResourceHandler interface defines how Resources through the application have to be defined.
+// Ideally, the developer will composite the Resource struct into their own resources,
+// but it's possible to implement each one by their own.
+type ResourceHandler interface {
+	// HTTP methods
+	Get() error
+	Post() error
+	Put() error
+	Patch() error
+	Delete() error
+	Options() error
+	Head() error
+	Trace() error
+	Connect() error
+
+	// Context setter
+	SetContext(*Context)
+}
+
 // The Resource type is the representation of each REST resource of the application.
-// It implements the RestResource interface and allows the developer to extend the methods needed.
+// It implements the ResourceHandler interface and allows the developer to extend the methods needed.
 // All resources being used by a YARF application have to composite this Resource struct.
 type Resource struct {
 	RequestContext
@@ -56,23 +75,4 @@ func (r *Resource) Trace() error {
 // HTTP CONNECT
 func (r *Resource) Connect() error {
 	return ErrorMethodNotImplemented()
-}
-
-// The RestResource interface defines how Resources through the application have to be defined.
-// Ideally, the developer will composite the Resource struct into their own resources,
-// but it's possible to implement each one by their own.
-type RestResource interface {
-	// HTTP methods
-	Get() error
-	Post() error
-	Put() error
-	Patch() error
-	Delete() error
-	Options() error
-	Head() error
-	Trace() error
-	Connect() error
-
-	// Context setter
-	SetContext(*Context)
 }

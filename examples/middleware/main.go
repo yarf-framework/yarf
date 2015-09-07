@@ -8,7 +8,7 @@ import (
 // It runs a default server listening on http://localhost:8080
 func main() {
 	// Create a new empty YARF server
-	y := yarf.New()
+	y := yarf.Yarf()
 
 	// Add middleware
 	y.Insert(new(HelloMiddleware))

@@ -38,7 +38,7 @@ func NewContext(r *http.Request, rw http.ResponseWriter) *Context {
 }
 
 // RequestContext implements Context related methods to interact with the Context object.
-// It's also used to composite into Resource and Middleware to satisfy the interfaces.
+// It's used to composite into Resource and Middleware to satisfy the interfaces.
 type RequestContext struct {
 	Context *Context
 }
