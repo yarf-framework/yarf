@@ -60,9 +60,9 @@ For more code and examples demonstrating all YARF features, please refer to the 
 #### v0.2
 
 - **Resource based design:** Each resource can implement one, several or all HTTP methods needed (GET, POST, DELETE, etc.).
-- **Simple router: ** Matches exact URLs against resources for increased performance. The routes supports params in the form /:param.
-- **Optional parameters: ** Supported using multiple routes on the same Resource.
-- **Middleware: ** Support at router level, all routes will be pre-filtered and post-filtered by Middleware handlers.
+- **Simple router:** Matches exact URLs against resources for increased performance. The routes supports params in the form /:param.
+- **Optional parameters:** Supported using multiple routes on the same Resource.
+- **Middleware:** Support at router level, all routes will be pre-filtered and post-filtered by Middleware handlers.
 - **Route groups:** Routes can be grouped into a route prefix and handle their own middleware.
 - **Nested groups:** As routes can be grouped into a route prefix, other groups can be also grouped allowing for nested prefixes and middleware layers.
 
