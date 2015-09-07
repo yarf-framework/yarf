@@ -155,6 +155,8 @@ func (r *route) Dispatch(c *Context) (err error) {
 type routeGroup struct {
 	prefix string // The url prefix path for all routes in the group
 
+	parsed string // Cleaned prefix used to Match() against request url
+
 	middleware []MiddlewareHandler // Group middleware resources
 
 	routes []Router // Group routes
@@ -163,9 +165,18 @@ type routeGroup struct {
 }
 
 // RouteGroup is the constructor for the routeGroup object
-func RouteGroup(prefix string) *routeGroup {
+func RouteGroup(url string) *routeGroup {
 	r := new(routeGroup)
-	r.prefix = prefix
+	r.prefix = url
+
+	// Clean initial and trailing "/" from url
+	for strings.HasPrefix(url, "/") {
+		url = strings.TrimPrefix(url, "/")
+	}
+	for strings.HasSuffix(url, "/") {
+		url = strings.TrimSuffix(url, "/")
+	}
+	r.parsed = url
 
 	return r
 }
@@ -175,8 +186,62 @@ func RouteGroup(prefix string) *routeGroup {
 // to being able to dispatch it directly after a match without looping again.
 // Outside the box, works exactly the same as route.Match()
 func (g *routeGroup) Match(url string, c *Context) bool {
+	// Init group params
+	params := make(map[string]string)
+
+	// Clean initial and trailing "/" from request url
+	for strings.HasPrefix(url, "/") {
+		url = strings.TrimPrefix(url, "/")
+	}
+	for strings.HasSuffix(url, "/") {
+		url = strings.TrimSuffix(url, "/")
+	}
+
+	// Split parts
+	routeParts := strings.Split(g.parsed, "/")
+	urlParts := strings.Split(url, "/")
+
+	// Remove empty parts
+	for i, p := range routeParts {
+		if p == "" {
+			routeParts = append(routeParts[:i], routeParts[i+1:]...)
+		}
+	}
+	for i, p := range urlParts {
+		if p == "" {
+			urlParts = append(urlParts[:i], urlParts[i+1:]...)
+		}
+	}
+
+	// Check for enough parts on the request
+	if len(urlParts) < len(routeParts) {
+		return false
+	}
+
+	// Check for param matching
+	for i, p := range routeParts {
+		// Check part
+		if p != urlParts[i] && p[:1] != ":" {
+			return false
+		}
+
+		// Check param
+		if p[:1] == ":" {
+			params[p[1:]] = urlParts[i]
+		}
+	}
+
+	// Success match. Store group params.
+	for key, value := range params {
+		c.Params.Set(key, value)
+	}
+
+	// Remove prefix part form the request URL
+	rUrl := strings.Join(urlParts[len(routeParts):], "/")
+
+	// Now look for a match inside the routes collection
 	for _, r := range g.routes {
-		if r.Match(url, c) {
+		if r.Match(rUrl, c) {
 			// If a match is found, store the lastMatch and return true.
 			g.lastMatch = r
 			return true
@@ -227,11 +292,16 @@ func (g *routeGroup) Dispatch(c *Context) (err error) {
 
 // Add inserts a new resource with it's associated route.
 func (g *routeGroup) Add(url string, h ResourceHandler) {
-	g.routes = append(g.routes, Route(g.prefix+url, h))
+	g.routes = append(g.routes, Route(url, h))
 }
 
 // AddGroup inserts a route group into the routes list.
 // This makes possible to nest groups.
 func (g *routeGroup) AddGroup(r *routeGroup) {
 	g.routes = append(g.routes, r)
+}
+
+// Insert adds a MiddlewareHandler into the middleware list
+func (g *routeGroup) Insert(m MiddlewareHandler) {
+	g.middleware = append(g.middleware, m)
 }

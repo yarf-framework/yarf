@@ -1,8 +1,8 @@
 package yarf
 
 import (
-	"testing"
 	"net/url"
+	"testing"
 )
 
 // Empty handler
@@ -215,7 +215,7 @@ func TestRouterMultiLevelParamUnmatch(t *testing.T) {
 	// Create empty context
 	c := new(Context)
 	c.Params = url.Values{}
-	
+
 	// Create route
 	r := Route("/a/b/:param", h)
 

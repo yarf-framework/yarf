@@ -13,6 +13,11 @@ The project is still in development and probably not working, but growing step b
 The first release of the version 0.1 should be a working framework with a tiny set of basic features.
 
 
+## Documentation
+
+[https://godoc.org/github.com/yarf-framework/yarf]
+
+
 ## Code
 
 Here's a transcription from our examples/simple package. 
@@ -54,11 +59,12 @@ For more code and examples demonstrating all YARF features, please refer to the 
 
 #### v0.2
 
-- Resource based design, each resource can implement one or all HTTP methods needed (GET, POST, DELETE, etc.).
-- Simple router matches exact URLs against resources. The routes supports params in the form /:param.
-- Support for optional parameters defining multiple routes against the same Resource.
-- Middleware support at router level. All routes (and methods) will be pre-filtered and post-filtered by Middleware handlers.
-- Route groups. Routes can be grouped into a route prefix and handle their own middleware.
+- **Resource based design:** Each resource can implement one, several or all HTTP methods needed (GET, POST, DELETE, etc.).
+- **Simple router: ** Matches exact URLs against resources for increased performance. The routes supports params in the form /:param.
+- **Optional parameters: ** Supported using multiple routes on the same Resource.
+- **Middleware: ** Support at router level, all routes will be pre-filtered and post-filtered by Middleware handlers.
+- **Route groups:** Routes can be grouped into a route prefix and handle their own middleware.
+- **Nested groups:** As routes can be grouped into a route prefix, other groups can be also grouped allowing for nested prefixes and middleware layers.
 
 
 
@@ -68,6 +74,7 @@ Features that are planned to be implemented soon.
 
 - Framework Tests.
 - Framework Benchmarks.
+- Increase custom errors collection.
 - Middleware support at Resource level.
 - Middleware and Lib packages with extra/useful functionality to add to any web application.
 - Gzip responses.
