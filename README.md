@@ -1,3 +1,5 @@
+[![GoDoc](https://godoc.org/github.com/yarf-framework/yarf?status.svg)](https://godoc.org/github.com/yarf-framework/yarf)
+
 # YARF: Yet Another REST Framework
 
 YARF is a micro-framework designed to build REST APIs and web services in a fast and simple way. 
