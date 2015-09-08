@@ -15,9 +15,9 @@ type yarf struct {
 	middleware []MiddlewareHandler // Middleware resources
 }
 
-// Yarf creates a new yarf and returns a pointer to it.
+// New creates a new yarf and returns a pointer to it.
 // Performs needed initializations
-func Yarf() *yarf {
+func New() *yarf {
 	y := new(yarf)
 
 	// No initialization routines yet...

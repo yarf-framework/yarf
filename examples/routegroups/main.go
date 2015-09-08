@@ -17,7 +17,7 @@ import (
 //
 func main() {
 	// Create a new empty YARF server
-	y := yarf.Yarf()
+	y := yarf.New()
 
 	// Create resources
 	hello := new(Hello)

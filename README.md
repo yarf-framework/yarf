@@ -45,8 +45,10 @@ func (h *Hello) Get() error {
 
 // Run app server on http://localhost:8080
 func main() {
-    y := yarf.Yarf()
+    y := yarf.New()
+    
     y.Add("/", new(Hello))
+    
     y.Start(":8080")
 }
 

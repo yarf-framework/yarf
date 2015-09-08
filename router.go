@@ -14,8 +14,10 @@ type Router interface {
 // route struct stores the expected route path and the ResourceHandler that handles that route.
 type route struct {
 	path string // Original route
-
-	parsed string // Cleaned route used to Match() against request url
+	
+	parsed	string // Cleaned route
+	
+	routeParts	[]string // Route splited in parts
 
 	handler ResourceHandler // Handler for the route
 }
@@ -38,6 +40,9 @@ func Route(url string, h ResourceHandler) *route {
 		url = strings.TrimSuffix(url, "/")
 	}
 	r.parsed = url
+	
+	// Split route parts
+	r.routeParts = strings.Split(r.parsed, "/")
 
 	return r
 }
@@ -59,14 +64,13 @@ func (r *route) Match(url string, c *Context) bool {
 		url = strings.TrimSuffix(url, "/")
 	}
 
-	// Split parts
-	routeParts := strings.Split(r.parsed, "/")
+	// Split url parts
 	urlParts := strings.Split(url, "/")
 
 	// Remove empty parts
-	for i, p := range routeParts {
+	for i, p := range r.routeParts {
 		if p == "" {
-			routeParts = append(routeParts[:i], routeParts[i+1:]...)
+			r.routeParts = append(r.routeParts[:i], r.routeParts[i+1:]...)
 		}
 	}
 	for i, p := range urlParts {
@@ -76,42 +80,44 @@ func (r *route) Match(url string, c *Context) bool {
 	}
 
 	// YARF router only accepts exact route matches, so check for part count.
-	if len(urlParts) != len(routeParts) {
+	if len(urlParts) != len(r.routeParts) {
 		return false
 	}
 
 	// Check for param matching
 	if r.parsed != url {
-		for i, r := range routeParts {
+		for i, p := range r.routeParts {
 			// Check part
-			if r != urlParts[i] && r[:1] != ":" {
+			if p != urlParts[i] && p[:1] != ":" {
 				return false
 			}
 
 			// Check param
-			if r[:1] == ":" {
-				params[r[1:]] = urlParts[i]
+			if p[:1] == ":" {
+				params[p[1:]] = urlParts[i]
 			}
+		}
+		
+		// Success match. Store params and return true.
+		for key, value := range params {
+			c.Params.Set(key, value)
 		}
 	}
 
-	// Success match. Store params and return true.
-	for key, value := range params {
-		c.Params.Set(key, value)
-	}
 	return true
 }
 
 // Dispatch executes the right ResourceHandler method based on the HTTP request in the Context object.
 // Accepts HTTP method override, based on request header: X-HTTP-Method-Override
 func (r *route) Dispatch(c *Context) (err error) {
-	// Get HTTP method requested
-	method := strings.ToUpper(c.Request.Method)
+	var method string
 
 	// Check for method overriding
-	mo := strings.ToUpper(c.Request.Header.Get("X-HTTP-Method-Override"))
-	if mo != "" {
-		method = mo
+	if c.Request.Header.Get("X-HTTP-Method-Override") != "" {
+	    method = strings.ToUpper(c.Request.Header.Get("X-HTTP-Method-Override"))
+	} else {
+	    // Get HTTP method requested
+		method = strings.ToUpper(c.Request.Method)
 	}
 
 	// Add Context to handler
@@ -145,6 +151,9 @@ func (r *route) Dispatch(c *Context) (err error) {
 
 	case "CONNECT":
 		err = r.handler.Connect()
+		
+	default:
+		err = ErrorMethodNotImplemented()
 	}
 
 	// Return error status
