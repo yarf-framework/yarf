@@ -85,23 +85,21 @@ func (r *route) Match(url string, c *Context) bool {
 	}
 
 	// Check for param matching
-	if r.parsed != url {
-		for i, p := range r.routeParts {
-			// Check part
-			if p != urlParts[i] && p[:1] != ":" {
-				return false
-			}
-
-			// Check param
-			if p[:1] == ":" {
-				params[p[1:]] = urlParts[i]
-			}
+	for i, p := range r.routeParts {
+		// Check part
+		if p != urlParts[i] && p[:1] != ":" {
+			return false
 		}
 
-		// Success match. Store params and return true.
-		for key, value := range params {
-			c.Params.Set(key, value)
+		// Check param
+		if p[:1] == ":" {
+			params[p[1:]] = urlParts[i]
 		}
+	}
+
+	// Success match. Store params and return true.
+	for key, value := range params {
+		c.Params.Set(key, value)
 	}
 
 	return true
