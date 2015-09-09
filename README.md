@@ -21,7 +21,7 @@ https://godoc.org/github.com/yarf-framework/yarf
 
 
 
-## Code
+## Getting started
 
 Here's a transcription from our examples/simple package. 
 This is a very simple Hello World web application example. 

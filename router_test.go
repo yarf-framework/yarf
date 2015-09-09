@@ -288,7 +288,7 @@ func TestRouterNestedGroupMatch(t *testing.T) {
 	l1 := RouteGroup("/level1")
 	l2 := RouteGroup("/level2")
 	l3 := RouteGroup("/level3")
-	
+
 	// Add one route
 	l3.Add("/test/:param", h)
 
