@@ -14,10 +14,10 @@ type Router interface {
 // route struct stores the expected route path and the ResourceHandler that handles that route.
 type route struct {
 	path string // Original route
-	
-	parsed	string // Cleaned route
-	
-	routeParts	[]string // Route splited in parts
+
+	parsed string // Cleaned route
+
+	routeParts []string // Route splited in parts
 
 	handler ResourceHandler // Handler for the route
 }
@@ -40,7 +40,7 @@ func Route(url string, h ResourceHandler) *route {
 		url = strings.TrimSuffix(url, "/")
 	}
 	r.parsed = url
-	
+
 	// Split route parts
 	r.routeParts = strings.Split(r.parsed, "/")
 
@@ -97,7 +97,7 @@ func (r *route) Match(url string, c *Context) bool {
 				params[p[1:]] = urlParts[i]
 			}
 		}
-		
+
 		// Success match. Store params and return true.
 		for key, value := range params {
 			c.Params.Set(key, value)
@@ -114,9 +114,9 @@ func (r *route) Dispatch(c *Context) (err error) {
 
 	// Check for method overriding
 	if c.Request.Header.Get("X-HTTP-Method-Override") != "" {
-	    method = strings.ToUpper(c.Request.Header.Get("X-HTTP-Method-Override"))
+		method = strings.ToUpper(c.Request.Header.Get("X-HTTP-Method-Override"))
 	} else {
-	    // Get HTTP method requested
+		// Get HTTP method requested
 		method = strings.ToUpper(c.Request.Method)
 	}
 
@@ -151,7 +151,7 @@ func (r *route) Dispatch(c *Context) (err error) {
 
 	case "CONNECT":
 		err = r.handler.Connect()
-		
+
 	default:
 		err = ErrorMethodNotImplemented()
 	}

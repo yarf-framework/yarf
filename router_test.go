@@ -229,3 +229,103 @@ func TestRouterMultiLevelParamUnmatch(t *testing.T) {
 		}
 	}
 }
+
+func TestRouterGroupMatch(t *testing.T) {
+	// Create empty handler
+	h := new(Handler)
+
+	// Create empty context
+	c := new(Context)
+	c.Params = url.Values{}
+
+	// Create group
+	g := RouteGroup("/v1")
+	g.Add("/test/:param", h)
+
+	// Matching routes
+	rs := []string{"/v1/test/test", "/v1/test/:param/"}
+
+	// Check
+	for _, s := range rs {
+		if !g.Match(s, c) {
+			t.Errorf("'%s' should match", s)
+		}
+	}
+}
+
+func TestRouterGroupNotMatch(t *testing.T) {
+	// Create empty handler
+	h := new(Handler)
+
+	// Create empty context
+	c := new(Context)
+	c.Params = url.Values{}
+
+	// Create group
+	g := RouteGroup("/v1")
+	g.Add("/test/:param", h)
+
+	// Non-Matching routes
+	rs := []string{"/test/test", "/v1/test", "/v1/test/a/b", "/v1", "/"}
+
+	// Check
+	for _, s := range rs {
+		if g.Match(s, c) {
+			t.Errorf("'%s' shouldn't match", s)
+		}
+	}
+}
+
+func TestRouterNestedGroupMatch(t *testing.T) {
+	// Create empty handler
+	h := new(Handler)
+
+	// Create empty context
+	c := new(Context)
+	c.Params = url.Values{}
+
+	// Create groups
+	l1 := RouteGroup("/level1")
+	l2 := RouteGroup("/level2")
+	l3 := RouteGroup("/level3")
+	
+	// Add one route
+	l3.Add("/test/:param", h)
+
+	// Neste into:
+	// - /level1/level2/level3/test/:param
+	// - /level2/level3/test/:param
+	// - /level3/test/:param
+	l2.AddGroup(l3)
+	l1.AddGroup(l2)
+
+	// Level 3 matching routes
+	rs := []string{"/level3/test/test", "/level3/test/:param/"}
+
+	// Check
+	for _, s := range rs {
+		if !l3.Match(s, c) {
+			t.Errorf("'%s' should match", s)
+		}
+	}
+
+	// Level 2 matching routes
+	rs = []string{"/level2/level3/test/test", "/level2/level3/test/:param/"}
+
+	// Check
+	for _, s := range rs {
+		if !l2.Match(s, c) {
+			t.Errorf("'%s' should match", s)
+		}
+	}
+
+	// Level 1 matching routes
+	rs = []string{"/level1/level2/level3/test/test", "/level1/level2/level3/test/:param/"}
+
+	// Check
+	for _, s := range rs {
+		if !l1.Match(s, c) {
+			t.Errorf("'%s' should match", s)
+		}
+	}
+}
