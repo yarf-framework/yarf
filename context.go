@@ -19,10 +19,10 @@ type Context struct {
 	Params url.Values
 
 	// The HTTP status code to be writen to the response.
-	responseStatus int
+	ResponseStatus int
 
 	// The aggregated response body to be writen to the response.
-	responseContent string
+	ResponseContent string
 }
 
 // NewContext instantiates a new *Context object with default values and returns it.
@@ -30,7 +30,7 @@ func NewContext(r *http.Request, rw http.ResponseWriter) *Context {
 	c := new(Context)
 	c.Request = r
 	c.Response = rw
-	c.responseStatus = 200
+	c.ResponseStatus = 200
 	c.Params = url.Values{}
 
 	return c
@@ -48,13 +48,19 @@ func (rc *RequestContext) SetContext(c *Context) {
 }
 
 // Render takes a string and aggregates it to the Context.responseContent.
+// This is the default renderer, which sets a text/plain Content-Type header.
+// Check other Render[Type] functions for different types.
 func (rc *RequestContext) Render(content string) {
-	rc.Context.responseContent += content
+	// Set header
+	rc.Context.Response.Header().Set("Content-Type", "text/plain")
+
+	// Set content
+	rc.Context.ResponseContent += content
 }
 
 // Status sets the HTTP status code to be returned on the response.
 func (rc *RequestContext) Status(code int) {
-	rc.Context.responseStatus = code
+	rc.Context.ResponseStatus = code
 }
 
 // Param is a wrapper for rc.Context.Params.Get()

@@ -146,15 +146,15 @@ func (y *yarf) Response(c *Context, err error) {
 		}
 
 		// Replace context content with error data.
-		c.responseStatus = err.(YError).Code()
-		c.responseContent = err.(YError).Body()
+		c.ResponseStatus = err.(YError).Code()
+		c.ResponseContent = err.(YError).Body()
 	}
 
 	// Write HTTP status
-	c.Response.WriteHeader(c.responseStatus)
+	c.Response.WriteHeader(c.ResponseStatus)
 
 	// Write body
-	c.Response.Write([]byte(c.responseContent))
+	c.Response.Write([]byte(c.ResponseContent))
 }
 
 // Start initiates a new http yarf and start listening.
