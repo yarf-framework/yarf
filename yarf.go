@@ -6,7 +6,7 @@ import (
 )
 
 // Framework version string
-const Version = "0.2"
+const Version = "0.3"
 
 // routeCache stores previously matched and parsed routes
 type routeCache struct {
