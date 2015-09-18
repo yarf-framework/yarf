@@ -3,6 +3,7 @@ package yarf
 import (
 	"net/http"
 	"net/url"
+	"encoding/json"
 )
 
 // Context is the data/status storage of every YARF request.
@@ -47,6 +48,16 @@ func (rc *RequestContext) SetContext(c *Context) {
 	rc.Context = c
 }
 
+// Status sets the HTTP status code to be returned on the response.
+func (rc *RequestContext) Status(code int) {
+	rc.Context.ResponseStatus = code
+}
+
+// Param is a wrapper for rc.Context.Params.Get()
+func (rc *RequestContext) Param(name string) string {
+	return rc.Context.Params.Get(name)
+}
+
 // Render takes a string and aggregates it to the Context.responseContent.
 // This is the default renderer, which sets a text/plain Content-Type header.
 // Check other Render[Type] functions for different types.
@@ -58,12 +69,16 @@ func (rc *RequestContext) Render(content string) {
 	rc.Context.ResponseContent += content
 }
 
-// Status sets the HTTP status code to be returned on the response.
-func (rc *RequestContext) Status(code int) {
-	rc.Context.ResponseStatus = code
-}
-
-// Param is a wrapper for rc.Context.Params.Get()
-func (rc *RequestContext) Param(name string) string {
-	return rc.Context.Params.Get(name)
+// RenderJSON takes a interface{} object and writes the JSON encoded string of it. 
+func (rc *RequestContext) RenderJSON(data interface{}) {
+    // Set header
+	rc.Context.Response.Header().Set("Content-Type", "application/json")
+	
+	// Set content
+	encoded, err := json.Marshal(data)
+	if err != nil {
+		rc.Context.ResponseContent += err.Error()
+	} else {
+		rc.Context.ResponseContent += string(encoded)
+	}
 }
