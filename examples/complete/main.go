@@ -18,8 +18,11 @@ func main() {
 	y.Add("/", hello)
 	y.Add("/hello/:name", hello)
 
-	// Add gzip middleware at the end of the chain.
+	// Add gzip middleware first in the chain.
 	y.Insert(new(middleware.Gzip))
+
+	// Add logger middleware at the end of the chain
+	y.Insert(new(middleware.Logger))
 
 	// Start server listening on port 8080
 	y.Start(":8080")

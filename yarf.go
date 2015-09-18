@@ -131,8 +131,8 @@ func (y *yarf) dispatch(r Router, c *Context) {
 			}
 		}
 	}
-    
-    // Error handling
+
+	// Error handling
 	if err != nil {
 		if _, ok := err.(YError); !ok {
 			err = ErrorUnexpected()
@@ -144,16 +144,14 @@ func (y *yarf) dispatch(r Router, c *Context) {
 	}
 }
 
-// Start initiates a new http yarf and start listening.
-// It's a wrapper for http.ListenAndServe(addr, router)
+// Start initiates a new http yarf server and start listening.
+// It's a shortcut for http.ListenAndServe(address, y)
 func (y *yarf) Start(address string) {
-	// Run
 	http.ListenAndServe(address, y)
 }
 
-// StartTLS initiats a new http yarf and starts listening and HTTPS requests.
+// StartTLS initiates a new http yarf server and starts listening to HTTPS requests.
 // It is a shortcut for http.ListenAndServeTLS(address, cert, key, yarf)
 func (y *yarf) StartTLS(address, cert, key string) {
-	// Run
 	http.ListenAndServeTLS(address, cert, key, y)
 }

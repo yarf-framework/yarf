@@ -18,7 +18,7 @@ type route struct {
 	parsed string // Cleaned route
 
 	routeParts []string // Route splited in parts
-	
+
 	requestParts []string // Pre-allocate the parts of the request url
 
 	handler ResourceHandler // Handler for the route
@@ -94,7 +94,7 @@ func (r *route) Match(url string, c *Context) bool {
 	// Success match. Store params and return true.
 	for i, p := range r.routeParts {
 		if p[:1] == ":" {
-		    c.Params.Set(p[1:], r.requestParts[i]) 
+			c.Params.Set(p[1:], r.requestParts[i])
 		}
 	}
 
@@ -105,7 +105,7 @@ func (r *route) Match(url string, c *Context) bool {
 func (r *route) Dispatch(c *Context) (err error) {
 	// Add Context to handler
 	r.handler.SetContext(c)
-	
+
 	// Method dispatch
 	switch c.Request.Method {
 	case "GET":

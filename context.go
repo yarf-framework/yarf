@@ -1,9 +1,9 @@
 package yarf
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/url"
-	"encoding/json"
 )
 
 // Context is the data/status storage of every YARF request.
@@ -28,13 +28,13 @@ type Context struct {
 
 // NewContext instantiates a new *Context object with default values and returns it.
 func NewContext(r *http.Request, rw http.ResponseWriter) *Context {
-    return &Context{
-        Request: r,
-        Response: rw,
-        Params: url.Values{},
-        //ResponseStatus: 200,
-        //ResponseContent: "",
-    }
+	return &Context{
+		Request:  r,
+		Response: rw,
+		Params:   url.Values{},
+		//ResponseStatus: 200,
+		//ResponseContent: "",
+	}
 }
 
 // RequestContext implements Context related methods to interact with the Context object.
@@ -51,7 +51,7 @@ func (rc *RequestContext) SetContext(c *Context) {
 // Status sets the HTTP status code to be returned on the response.
 func (rc *RequestContext) Status(code int) {
 	//rc.Context.ResponseStatus = code
-	
+
 	rc.Context.Response.WriteHeader(code)
 }
 
@@ -60,7 +60,7 @@ func (rc *RequestContext) Param(name string) string {
 	return rc.Context.Params.Get(name)
 }
 
-// Render writes a string to the http.ResponseWriter. 
+// Render writes a string to the http.ResponseWriter.
 // This is the default renderer that just sends the string to the client.
 // Check other Render[Type] functions for different types.
 func (rc *RequestContext) Render(content string) {
@@ -69,24 +69,24 @@ func (rc *RequestContext) Render(content string) {
 
 	// Set content
 	//rc.Context.ResponseContent += content
-	
+
 	rc.Context.Response.Write([]byte(content))
 }
 
-// RenderJSON takes a interface{} object and writes the JSON encoded string of it. 
+// RenderJSON takes a interface{} object and writes the JSON encoded string of it.
 func (rc *RequestContext) RenderJSON(data interface{}) {
-    // Set header
+	// Set header
 	rc.Context.Response.Header().Set("Content-Type", "application/json")
-	
+
 	// Set content
 	encoded, err := json.Marshal(data)
 	if err != nil {
 		rc.Context.Response.Write([]byte(err.Error()))
-		
+
 		//rc.Context.ResponseContent += err.Error()
 	} else {
-	    rc.Context.Response.Write(encoded)
-	    
+		rc.Context.Response.Write(encoded)
+
 		//rc.Context.ResponseContent += string(encoded)
 	}
 }
