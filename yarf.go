@@ -95,7 +95,7 @@ func (y *yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	}
 
 	// Return 404
-	y.Response(c, ErrorNotFound())
+	c.Response.WriteHeader(404)
 }
 
 // Dispatch performs the middleware and route handler actions for a given route and context.
@@ -131,30 +131,17 @@ func (y *yarf) dispatch(r Router, c *Context) {
 			}
 		}
 	}
-
-	// Return result
-	y.Response(c, err)
-}
-
-// Response writes the corresponding response to the HTTP response writer.
-// It will handle the error status and the response body to be sent.
-func (y *yarf) Response(c *Context, err error) {
-	// Error handling
+    
+    // Error handling
 	if err != nil {
 		if _, ok := err.(YError); !ok {
 			err = ErrorUnexpected()
 		}
 
 		// Replace context content with error data.
-		c.ResponseStatus = err.(YError).Code()
-		c.ResponseContent = err.(YError).Body()
+		c.Response.WriteHeader(err.(YError).Code())
+		c.Response.Write([]byte(err.(YError).Body()))
 	}
-
-	// Write HTTP status
-	c.Response.WriteHeader(c.ResponseStatus)
-
-	// Write body
-	c.Response.Write([]byte(c.ResponseContent))
 }
 
 // Start initiates a new http yarf and start listening.

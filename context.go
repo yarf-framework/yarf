@@ -20,21 +20,21 @@ type Context struct {
 	Params url.Values
 
 	// The HTTP status code to be writen to the response.
-	ResponseStatus int
+	//ResponseStatus int
 
 	// The aggregated response body to be writen to the response.
-	ResponseContent string
+	//ResponseContent string
 }
 
 // NewContext instantiates a new *Context object with default values and returns it.
 func NewContext(r *http.Request, rw http.ResponseWriter) *Context {
-	c := new(Context)
-	c.Request = r
-	c.Response = rw
-	c.ResponseStatus = 200
-	c.Params = url.Values{}
-
-	return c
+    return &Context{
+        Request: r,
+        Response: rw,
+        Params: url.Values{},
+        //ResponseStatus: 200,
+        //ResponseContent: "",
+    }
 }
 
 // RequestContext implements Context related methods to interact with the Context object.
@@ -50,7 +50,9 @@ func (rc *RequestContext) SetContext(c *Context) {
 
 // Status sets the HTTP status code to be returned on the response.
 func (rc *RequestContext) Status(code int) {
-	rc.Context.ResponseStatus = code
+	//rc.Context.ResponseStatus = code
+	
+	rc.Context.Response.WriteHeader(code)
 }
 
 // Param is a wrapper for rc.Context.Params.Get()
@@ -58,15 +60,17 @@ func (rc *RequestContext) Param(name string) string {
 	return rc.Context.Params.Get(name)
 }
 
-// Render takes a string and aggregates it to the Context.responseContent.
-// This is the default renderer, which sets a text/plain Content-Type header.
+// Render writes a string to the http.ResponseWriter. 
+// This is the default renderer that just sends the string to the client.
 // Check other Render[Type] functions for different types.
 func (rc *RequestContext) Render(content string) {
 	// Set header
-	rc.Context.Response.Header().Set("Content-Type", "text/plain")
+	//rc.Context.Response.Header().Set("Content-Type", "text/plain")
 
 	// Set content
-	rc.Context.ResponseContent += content
+	//rc.Context.ResponseContent += content
+	
+	rc.Context.Response.Write([]byte(content))
 }
 
 // RenderJSON takes a interface{} object and writes the JSON encoded string of it. 
@@ -77,8 +81,12 @@ func (rc *RequestContext) RenderJSON(data interface{}) {
 	// Set content
 	encoded, err := json.Marshal(data)
 	if err != nil {
-		rc.Context.ResponseContent += err.Error()
+		rc.Context.Response.Write([]byte(err.Error()))
+		
+		//rc.Context.ResponseContent += err.Error()
 	} else {
-		rc.Context.ResponseContent += string(encoded)
+	    rc.Context.Response.Write(encoded)
+	    
+		//rc.Context.ResponseContent += string(encoded)
 	}
 }
