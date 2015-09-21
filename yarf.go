@@ -15,11 +15,20 @@ type routeCache struct {
 }
 
 // yarf is the main entry point for the framework and it centralizes most of the functionality.
-// All YARF configuration actions are handled by the yarf.
+// All configuration actions are handled by this object.
 type yarf struct {
-	routes []Router // yarf routes
+	// UseCache indicates if the route cache should be used.
+	UseCache bool
 
-	useCache bool // Indicates if the route cache should be used
+	// Debug enables/disables the debug mode.
+	// On debug mode, extra error information is sent to the client.
+	Debug bool
+
+	// Silent mode attempts to prevent all messages that aren't part of a resource response to get to the client.
+	// Specially useful to hide error messages.
+	Silent bool
+
+	routes []Router // yarf routes
 
 	cache map[string]routeCache // Cached routes storage
 
@@ -32,19 +41,11 @@ func New() *yarf {
 	y := new(yarf)
 
 	// Init cache
-	y.useCache = true
+	y.UseCache = true
 	y.cache = make(map[string]routeCache)
 
 	// Return object
 	return y
-}
-
-// UseCache sets the useCache flag to indicate if route caching should be enabled.
-// The route cache improves the performance, but it also consumes (not that much) memory space.
-// If you're running out of RAM memory and/or your app has too many possible routes that may not fit,
-// you should disable the route cache.
-func (y *yarf) UseCache(b bool) {
-	y.useCache = b
 }
 
 // Add inserts a new resource with it's associated route.
@@ -71,7 +72,7 @@ func (y *yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	c := NewContext(req, res)
 
 	// Cached routes
-	if y.useCache {
+	if y.UseCache {
 		if cache, ok := y.cache[req.URL.Path]; ok {
 			// Set context params
 			c.Params = cache.params
@@ -132,14 +133,32 @@ func (y *yarf) dispatch(r Router, c *Context) {
 		}
 	}
 
-	// Error handling
-	if err != nil {
-		if _, ok := err.(YError); !ok {
-			err = ErrorUnexpected()
-		}
+	// Call error handler
+	y.errorHandler(err, c)
+}
 
-		// Replace context content with error data.
-		c.Response.WriteHeader(err.(YError).Code())
+// errorHandler deals with request errors.
+func (y *yarf) errorHandler(err error, c *Context) {
+	// Return if no error or silent mode
+	if err == nil || y.Silent {
+		return
+	}
+
+	// Check error type
+	if _, ok := err.(YError); !ok {
+		// Create custom 500 error
+		err = &CustomError{
+			httpCode:  500,
+			errorCode: 0,
+			errorMsg:  err.Error(),
+			errorBody: err.Error(),
+		}
+	}
+
+	// Write error data to response.
+	c.Response.WriteHeader(err.(YError).Code())
+
+	if y.Debug {
 		c.Response.Write([]byte(err.(YError).Body()))
 	}
 }

@@ -239,11 +239,11 @@ Check the ./examples/routegroups demo for the complete working implementation.
 A route cache is enabled by default to improve dispatch speed, but sacrificing memory space. 
 If you're running out of RAM memory and/or your app has too many possible routes that may not fit, you should disable the route cache.
 
-To enable/disable the route cache, just use the UseCache method of the YARF object: 
+To enable/disable the route cache, just set the UseCache flag of the Yarf object: 
 
 ```go
 y := yarf.New()
-y.UseCache(false)
+y.UseCache = false
 ```
 
 
