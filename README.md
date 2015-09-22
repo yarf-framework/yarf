@@ -1,17 +1,12 @@
 [![GoDoc](https://godoc.org/github.com/yarf-framework/yarf?status.svg)](https://godoc.org/github.com/yarf-framework/yarf)
 [![Build Status](https://travis-ci.org/yarf-framework/yarf.svg?branch=master)](https://travis-ci.org/yarf-framework/yarf)
 
+
 # YARF: Yet Another REST Framework
 
 YARF is a micro-framework designed to build REST APIs and web services in a fast and simple way. 
 It can be used to develop any kind of web application extending some features, but that's not the purpose of the framework.
 Designed after Go's composition features, takes a new approach to write simple and DRY code.
-
-
-
-## Version
-
-Current version is: **0.3**
 
 
 

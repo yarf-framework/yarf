@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 // Context is the data/status storage of every YARF request.
@@ -18,12 +19,6 @@ type Context struct {
 
 	// Parameters received through URL route
 	Params url.Values
-
-	// The HTTP status code to be writen to the response.
-	//ResponseStatus int
-
-	// The aggregated response body to be writen to the response.
-	//ResponseContent string
 }
 
 // NewContext instantiates a new *Context object with default values and returns it.
@@ -32,8 +27,6 @@ func NewContext(r *http.Request, rw http.ResponseWriter) *Context {
 		Request:  r,
 		Response: rw,
 		Params:   url.Values{},
-		//ResponseStatus: 200,
-		//ResponseContent: "",
 	}
 }
 
@@ -58,6 +51,43 @@ func (rc *RequestContext) Status(code int) {
 // Param is a wrapper for rc.Context.Params.Get()
 func (rc *RequestContext) Param(name string) string {
 	return rc.Context.Params.Get(name)
+}
+
+// GetClientIP retrieves the client IP address from the request information.
+// It detects common proxy headers to return the actual client's IP and not the proxy's.
+func (rc *RequestContext) GetClientIP() (ip string) {
+	var pIps string
+	var pIpList []string
+
+	if pIps = rc.Context.Request.Header.Get("X-Real-Ip"); pIps != "" {
+		pIpList = strings.Split(pIps, ",")
+		ip = strings.TrimSpace(pIpList[0])
+
+	} else if pIps = rc.Context.Request.Header.Get("Real-Ip"); pIps != "" {
+		pIpList = strings.Split(pIps, ",")
+		ip = strings.TrimSpace(pIpList[0])
+
+	} else if pIps = rc.Context.Request.Header.Get("X-Forwarded-For"); pIps != "" {
+		pIpList = strings.Split(pIps, ",")
+		ip = strings.TrimSpace(pIpList[0])
+
+	} else if pIps = rc.Context.Request.Header.Get("X-Forwarded"); pIps != "" {
+		pIpList = strings.Split(pIps, ",")
+		ip = strings.TrimSpace(pIpList[0])
+
+	} else if pIps = rc.Context.Request.Header.Get("Forwarded-For"); pIps != "" {
+		pIpList = strings.Split(pIps, ",")
+		ip = strings.TrimSpace(pIpList[0])
+
+	} else if pIps = rc.Context.Request.Header.Get("Forwarded"); pIps != "" {
+		pIpList = strings.Split(pIps, ",")
+		ip = strings.TrimSpace(pIpList[0])
+
+	} else {
+		ip = rc.Context.Request.RemoteAddr
+	}
+
+	return strings.Split(ip, ":")[0]
 }
 
 // Render writes a string to the http.ResponseWriter.

@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"github.com/yarf-framework/yarf"
-	"github.com/yarf-framework/yarf/lib/request"
 	"log"
 	"net/http"
 )
@@ -58,7 +57,7 @@ func (l *Logger) PostDispatch() error {
 
 	log.Printf(
 		"| %s | %s | %d | %s | %s ",
-		request.GetClientIP(l.Context.Request),
+		l.GetClientIP(),
 		l.Context.Request.Method,
 		code,
 		l.Context.Request.URL.String(),

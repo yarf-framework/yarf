@@ -6,7 +6,7 @@ import (
 )
 
 // Framework version string
-const Version = "0.3"
+const Version = "0.4"
 
 // routeCache stores previously matched and parsed routes
 type routeCache struct {
@@ -28,11 +28,18 @@ type yarf struct {
 	// Specially useful to hide error messages.
 	Silent bool
 
-	routes []Router // yarf routes
+	// PanicHandler can store a func() that will be defered by each request to be able to recover().
+	// If you need to log, send information or do anything about a panic, this is your place.
+	PanicHandler func()
 
-	cache map[string]routeCache // Cached routes storage
+	// routes storage
+	routes []Router
 
-	middleware []MiddlewareHandler // Middleware resources
+	// Cached routes storage
+	cache map[string]routeCache
+
+	// Middleware resources
+	middleware []MiddlewareHandler
 }
 
 // New creates a new yarf and returns a pointer to it.
@@ -101,6 +108,10 @@ func (y *yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 // Dispatch performs the middleware and route handler actions for a given route and context.
 func (y *yarf) dispatch(r Router, c *Context) {
+	if y.PanicHandler != nil {
+		defer y.PanicHandler()
+	}
+
 	// Init error status
 	var err error
 
@@ -162,6 +173,28 @@ func (y *yarf) errorHandler(err error, c *Context) {
 		c.Response.Write([]byte(err.(YError).Body()))
 	}
 }
+
+// panicHandler deals with panics during serving to avoid server crash.
+// Prints the error message and the stack trace information to the standard output.
+// At the end, calls
+/*
+func (y *yarf) panicHandler() {
+	if err := recover(); err != nil {
+		// Get stack trace
+		stack := make([]byte, 1<<16)
+		runtime.Stack(stack, false)
+
+		// Print panic info
+		println("PANIC!!! %v", err)
+		println(string(stack))
+
+		// Call custom panic handler
+		if y.PanicHandler != nil {
+		    y.PanicHandler(err)
+		}
+	}
+}
+*/
 
 // Start initiates a new http yarf server and start listening.
 // It's a shortcut for http.ListenAndServe(address, y)
