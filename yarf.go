@@ -6,7 +6,7 @@ import (
 )
 
 // Framework version string
-const Version = "0.4"
+const Version = "0.5"
 
 // routeCache stores previously matched and parsed routes
 type routeCache struct {
@@ -173,28 +173,6 @@ func (y *yarf) errorHandler(err error, c *Context) {
 		c.Response.Write([]byte(err.(YError).Body()))
 	}
 }
-
-// panicHandler deals with panics during serving to avoid server crash.
-// Prints the error message and the stack trace information to the standard output.
-// At the end, calls
-/*
-func (y *yarf) panicHandler() {
-	if err := recover(); err != nil {
-		// Get stack trace
-		stack := make([]byte, 1<<16)
-		runtime.Stack(stack, false)
-
-		// Print panic info
-		println("PANIC!!! %v", err)
-		println(string(stack))
-
-		// Call custom panic handler
-		if y.PanicHandler != nil {
-		    y.PanicHandler(err)
-		}
-	}
-}
-*/
 
 // Start initiates a new http yarf server and start listening.
 // It's a shortcut for http.ListenAndServe(address, y)

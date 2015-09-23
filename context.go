@@ -43,8 +43,6 @@ func (rc *RequestContext) SetContext(c *Context) {
 
 // Status sets the HTTP status code to be returned on the response.
 func (rc *RequestContext) Status(code int) {
-	//rc.Context.ResponseStatus = code
-
 	rc.Context.Response.WriteHeader(code)
 }
 
@@ -94,12 +92,10 @@ func (rc *RequestContext) GetClientIP() (ip string) {
 // This is the default renderer that just sends the string to the client.
 // Check other Render[Type] functions for different types.
 func (rc *RequestContext) Render(content string) {
-	// Set header
-	//rc.Context.Response.Header().Set("Content-Type", "text/plain")
+	// Detect content type
+	rc.Context.Response.Header().Set("Content-Type", http.DetectContentType([]byte(content)))
 
-	// Set content
-	//rc.Context.ResponseContent += content
-
+	// Write response
 	rc.Context.Response.Write([]byte(content))
 }
 
@@ -112,11 +108,7 @@ func (rc *RequestContext) RenderJSON(data interface{}) {
 	encoded, err := json.Marshal(data)
 	if err != nil {
 		rc.Context.Response.Write([]byte(err.Error()))
-
-		//rc.Context.ResponseContent += err.Error()
 	} else {
 		rc.Context.Response.Write(encoded)
-
-		//rc.Context.ResponseContent += string(encoded)
 	}
 }

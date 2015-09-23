@@ -182,9 +182,6 @@ func RouteGroup(url string) *routeGroup {
 // to being able to dispatch it directly after a match without looping again.
 // Outside the box, works exactly the same as route.Match()
 func (g *routeGroup) Match(url string, c *Context) bool {
-	// Init group params
-	params := make(map[string]string)
-
 	// Clean initial and trailing "/" from request url
 	for strings.HasPrefix(url, "/") {
 		url = strings.TrimPrefix(url, "/")
@@ -220,16 +217,13 @@ func (g *routeGroup) Match(url string, c *Context) bool {
 		if p != urlParts[i] && p[:1] != ":" {
 			return false
 		}
-
-		// Check param
-		if p[:1] == ":" {
-			params[p[1:]] = urlParts[i]
-		}
 	}
 
 	// Success match. Store group params.
-	for key, value := range params {
-		c.Params.Set(key, value)
+	for i, p := range routeParts {
+		if p[:1] == ":" {
+			c.Params.Set(p[1:], urlParts[i])
+		}
 	}
 
 	// Remove prefix part form the request URL
