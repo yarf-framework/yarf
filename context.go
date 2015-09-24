@@ -92,18 +92,12 @@ func (rc *RequestContext) GetClientIP() (ip string) {
 // This is the default renderer that just sends the string to the client.
 // Check other Render[Type] functions for different types.
 func (rc *RequestContext) Render(content string) {
-	// Detect content type
-	rc.Context.Response.Header().Set("Content-Type", http.DetectContentType([]byte(content)))
-
 	// Write response
 	rc.Context.Response.Write([]byte(content))
 }
 
 // RenderJSON takes a interface{} object and writes the JSON encoded string of it.
 func (rc *RequestContext) RenderJSON(data interface{}) {
-	// Set header
-	rc.Context.Response.Header().Set("Content-Type", "application/json")
-
 	// Set content
 	encoded, err := json.Marshal(data)
 	if err != nil {
