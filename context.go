@@ -2,6 +2,7 @@ package yarf
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"net/http"
 	"net/url"
 	"strings"
@@ -100,6 +101,39 @@ func (rc *RequestContext) Render(content string) {
 func (rc *RequestContext) RenderJSON(data interface{}) {
 	// Set content
 	encoded, err := json.Marshal(data)
+	if err != nil {
+		rc.Context.Response.Write([]byte(err.Error()))
+	} else {
+		rc.Context.Response.Write(encoded)
+	}
+}
+
+// RenderJSONIndent is the indented (beauty) of RenderJSON
+func (rc *RequestContext) RenderJSONIndent(data interface{}) {
+	// Set content
+	encoded, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		rc.Context.Response.Write([]byte(err.Error()))
+	} else {
+		rc.Context.Response.Write(encoded)
+	}
+}
+
+// RenderXML takes a interface{} object and writes the XML encoded string of it.
+func (rc *RequestContext) RenderXML(data interface{}) {
+	// Set content
+	encoded, err := xml.Marshal(data)
+	if err != nil {
+		rc.Context.Response.Write([]byte(err.Error()))
+	} else {
+		rc.Context.Response.Write(encoded)
+	}
+}
+
+// RenderXMLIndent is the indented (beauty) of RenderXML
+func (rc *RequestContext) RenderXMLIndent(data interface{}) {
+	// Set content
+	encoded, err := xml.MarshalIndent(data, "", "  ")
 	if err != nil {
 		rc.Context.Response.Write([]byte(err.Error()))
 	} else {
