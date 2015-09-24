@@ -28,8 +28,8 @@ Even when the code style differs from the net/http package, the framework is ful
 Extensions and utilities from other frameworks or even the net/http package can be easily implemented into Yarf by just wraping them up into a Resource, 
 just as you would do on another framework by wrapping functions.
   
-Context handling also shows some weird design across frameworks. Some of them rely on reflection to receive any kind of handlers and context types. 
-Others make you receive some extra parameter in the handler function that actually brokes the net/http compatyibility, and you have to carry that context parameter through all middleware/handler-wrapper functions just to make it available. 
+Context handling also shows some weird designs across frameworks. Some of them rely on reflection to receive any kind of handlers and context types. 
+Others make you receive some extra parameter in the handler function that actually brokes the net/http compatibility, and you have to carry that context parameter through all middleware/handler-wrapper functions just to make it available. 
 In Yarf, the Context is part of the Resource object and the framework takes care of setting it and make it available for use. 
 
 For all the reasons above and some others, is why there is a new framework in town. 
@@ -143,6 +143,50 @@ But it won't match:
 ```
 
 You can define optional parameters using multiple routes on the same Resource.
+
+
+### Route parameters
+
+At this point you know how to define parameters in your routes using the /:param naming convention. 
+Now you'll see how easy is to get these parameters by their name from your resources using the .Param() method. 
+
+Example: 
+
+For the route: 
+
+```
+/hello/:name
+```
+
+You can have this resource:
+
+```go
+import "github.com/yarf-framework/yarf"
+
+type Hello struct {
+    yarf.Resource
+}
+
+func (h *Hello) Get() error {
+    name := h.Param("name")
+
+    h.Render("Hello, " + name)
+
+    return nil
+}
+
+```
+
+
+### Context
+
+The Context object is a property of a Resource and it will be always available for you with the Context information about the ongoing request. 
+
+Check the Context docs for a reference of the object: [https://godoc.org/github.com/yarf-framework/yarf#Context](https://godoc.org/github.com/yarf-framework/yarf#Context)
+
+Also check the RequestContext docs, for a reference of the methods available to work with Context data from your handlers: [https://godoc.org/github.com/yarf-framework/yarf#RequestContext](https://godoc.org/github.com/yarf-framework/yarf#RequestContext) 
+All Resource objects implements (via composition) the RequestContext object. 
+
 
 
 ### Middleware support
