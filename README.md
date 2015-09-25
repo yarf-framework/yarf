@@ -4,7 +4,7 @@
 
 # YARF: Yet Another REST Framework
 
-YARF is fast a micro-framework designed to build REST APIs and web services in a fast and simple way. 
+YARF is a fast micro-framework designed to build REST APIs and web services in a fast and simple way. 
 Designed after Go's composition features, takes a new approach to write simple and DRY code.
 
 
