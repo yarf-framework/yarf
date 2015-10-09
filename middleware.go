@@ -4,7 +4,6 @@ import ()
 
 // MiddlewareHandler interface provides the methods for request filters
 // that needs to run before, or after, every request Resource is executed.
-// Both methods receives a Context pointer in case the middleware needs to modify Context data.
 type MiddlewareHandler interface {
 	PreDispatch() error
 	PostDispatch() error
