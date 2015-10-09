@@ -8,6 +8,22 @@ import (
 	"strings"
 )
 
+// ContextData interface represents a common get/set/del set of methods to handle data storage.
+// Is designed to be used as the Data property of the Context obejct.
+// The Data property is a free storage unit that apps using the framework can implement to their convenience
+// to share context data during a request life.
+// All methods returns an error status that different implementations can design to fulfill their needs.
+type ContextData interface {
+	// Get retrieves a data item by it's key name.
+	Get(key string) (interface{}, error)
+
+	// Set saves a data item under a key name.
+	Set(key string, data interface{}) error
+
+	// Del removes the data item and key name for a given key.
+	Del(key string) error
+}
+
 // Context is the data/status storage of every YARF request.
 // Every request will instantiate a new Context object and fill in with all the request data.
 // Each request Context will be shared along the entire request life to ensure accesibility of its data at all levels.
@@ -20,6 +36,9 @@ type Context struct {
 
 	// Parameters received through URL route
 	Params url.Values
+
+	// Free storage to be used freely by apps to their convenience.
+	Data ContextData
 }
 
 // NewContext instantiates a new *Context object with default values and returns it.
