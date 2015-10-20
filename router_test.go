@@ -329,3 +329,65 @@ func TestRouterNestedGroupMatch(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkRouteMatch_short(b *testing.B) {
+	h := &Handler{}
+	c := &Context{}
+	r := Route("/test", h)
+	for i := 0; i < b.N; i++ {
+		r.Match("/test", c)
+		r.Match("/nomatch", c)
+	}
+}
+
+func BenchmarkRouteMatch_long(b *testing.B) {
+	h := &Handler{}
+	c := &Context{}
+	routeString := "/very/long/route/with/ten/separate/parts/eight/nine/ten"
+	r := Route(routeString, h)
+	for i := 0; i < b.N; i++ {
+		r.Match(routeString, c)
+		r.Match("/short/request/url", c)
+		r.Match("/very/long/route/with/ten/separate/parts/that/doesnt/match", c)
+	}
+}
+
+func BenchmarkRouteMatch_emptyParts(b *testing.B) {
+	h := &Handler{}
+	c := &Context{}
+	r := Route("/route///with//lots////of///empty///parts/", h)
+	for i := 0; i < b.N; i++ {
+		r.Match("/route///with/lots/of////empty////parts/", c)
+		r.Match("/request/////url/////////////with//////////////tons//of/empty///////////parts/////////////test", c)
+	}
+}
+
+func BenchmarkRouteGroupMatch_short(b *testing.B) {
+	h := &Handler{}
+	c := &Context{}
+	r := RouteGroup("/prefix")
+	r.Add("/suffix", h)
+	for i := 0; i < b.N; i++ {
+		r.Match("/test", c)
+		r.Match("/nomatch", c)
+	}
+}
+
+func BenchmarkRouteGroupMatch_nested(b *testing.B) {
+	h := &Handler{}
+	c := &Context{}
+	// create a set of nested RouteGroups 20 levels deep
+	g := RouteGroup("/test")
+	g.Add("/router", h)
+	path := "/test/router"
+	for i := 0; i < 19; i++ {
+		r := RouteGroup("/test")
+		r.AddGroup(g)
+		g = r
+		path = "/test" + path
+	}
+	for i := 0; i < b.N; i++ {
+		g.Match(path, c)
+		g.Match(path+"matchfail", c)
+	}
+}
