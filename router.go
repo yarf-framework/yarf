@@ -29,7 +29,7 @@ func Route(url string, h ResourceHandler) Router {
 	return &route{
 		path:       url,
 		handler:    h,
-		routeParts: prepareUrl(url),
+		routeParts: prepareURL(url),
 	}
 }
 
@@ -40,7 +40,7 @@ func Route(url string, h ResourceHandler) Router {
 // When a route matches the request URL, this method will parse and fill
 // the parameters parsed during the process into the Context object.
 func (r *route) Match(url string, c *Context) bool {
-	requestParts := prepareUrl(url)
+	requestParts := prepareURL(url)
 
 	// YARF router only accepts exact route matches, so check for part count.
 	if len(r.routeParts) != len(requestParts) {
@@ -52,12 +52,7 @@ func (r *route) Match(url string, c *Context) bool {
 		return false
 	}
 
-	// Success match. Store params and return true.
-	for i, p := range r.routeParts {
-		if p[0] == ':' {
-			c.Params.Set(p[1:], requestParts[i])
-		}
-	}
+	storeParams(c, r.routeParts, requestParts)
 
 	return true
 }
@@ -125,7 +120,7 @@ type routeGroup struct {
 func RouteGroup(url string) *routeGroup {
 	return &routeGroup{
 		prefix:     url,
-		routeParts: prepareUrl(url),
+		routeParts: prepareURL(url),
 	}
 }
 
@@ -134,18 +129,11 @@ func RouteGroup(url string) *routeGroup {
 // to being able to dispatch it directly after a match without looping again.
 // Outside the box, works exactly the same as route.Match()
 func (g *routeGroup) Match(url string, c *Context) bool {
-	urlParts := prepareUrl(url)
+	urlParts := prepareURL(url)
 
 	// check if urlParts matches routeParts
 	if !matches(g.routeParts, urlParts) {
 		return false
-	}
-
-	// Success match. Store group params.
-	for i, p := range g.routeParts {
-		if p[0] == ':' {
-			c.Params.Set(p[1:], urlParts[i])
-		}
 	}
 
 	// Remove prefix part form the request URL
@@ -154,13 +142,13 @@ func (g *routeGroup) Match(url string, c *Context) bool {
 	// Now look for a match inside the routes collection
 	for _, r := range g.routes {
 		if r.Match(rURL, c) {
-			// If a match is found, store the lastMatch and return true.
+			// store the matching Router and params after a match is found
 			g.lastMatch = r
+			storeParams(c, g.routeParts, urlParts)
 			return true
 		}
 	}
 
-	// If no match found in this group, return false
 	return false
 }
 
@@ -219,7 +207,7 @@ func (g *routeGroup) Insert(m MiddlewareHandler) {
 }
 
 // prepareUrl trims leading and trailing slahses, splits url parts, and removes empty parts
-func prepareUrl(url string) []string {
+func prepareURL(url string) []string {
 	return removeEmpty(strings.Split(trimSlash(url), "/"))
 }
 
@@ -263,4 +251,14 @@ func matches(routeParts, requestParts []string) bool {
 	}
 
 	return true
+}
+
+// storeParams writes parts from requestParts that correspond with param names in
+// routeParts into c.Params.
+func storeParams(c *Context, routeParts, requestParts []string) {
+	for i, p := range routeParts {
+		if p[0] == ':' {
+			c.Params.Set(p[1:], requestParts[i])
+		}
+	}
 }
