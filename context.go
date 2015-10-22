@@ -74,32 +74,32 @@ func (rc *RequestContext) Param(name string) string {
 // GetClientIP retrieves the client IP address from the request information.
 // It detects common proxy headers to return the actual client's IP and not the proxy's.
 func (rc *RequestContext) GetClientIP() (ip string) {
-	var pIps string
-	var pIpList []string
+	var pIPs string
+	var pIPList []string
 
-	if pIps = rc.Context.Request.Header.Get("X-Real-Ip"); pIps != "" {
-		pIpList = strings.Split(pIps, ",")
-		ip = strings.TrimSpace(pIpList[0])
+	if pIPs = rc.Context.Request.Header.Get("X-Real-Ip"); pIPs != "" {
+		pIPList = strings.Split(pIPs, ",")
+		ip = strings.TrimSpace(pIPList[0])
 
-	} else if pIps = rc.Context.Request.Header.Get("Real-Ip"); pIps != "" {
-		pIpList = strings.Split(pIps, ",")
-		ip = strings.TrimSpace(pIpList[0])
+	} else if pIPs = rc.Context.Request.Header.Get("Real-Ip"); pIPs != "" {
+		pIPList = strings.Split(pIPs, ",")
+		ip = strings.TrimSpace(pIPList[0])
 
-	} else if pIps = rc.Context.Request.Header.Get("X-Forwarded-For"); pIps != "" {
-		pIpList = strings.Split(pIps, ",")
-		ip = strings.TrimSpace(pIpList[0])
+	} else if pIPs = rc.Context.Request.Header.Get("X-Forwarded-For"); pIPs != "" {
+		pIPList = strings.Split(pIPs, ",")
+		ip = strings.TrimSpace(pIPList[0])
 
-	} else if pIps = rc.Context.Request.Header.Get("X-Forwarded"); pIps != "" {
-		pIpList = strings.Split(pIps, ",")
-		ip = strings.TrimSpace(pIpList[0])
+	} else if pIPs = rc.Context.Request.Header.Get("X-Forwarded"); pIPs != "" {
+		pIPList = strings.Split(pIPs, ",")
+		ip = strings.TrimSpace(pIPList[0])
 
-	} else if pIps = rc.Context.Request.Header.Get("Forwarded-For"); pIps != "" {
-		pIpList = strings.Split(pIps, ",")
-		ip = strings.TrimSpace(pIpList[0])
+	} else if pIPs = rc.Context.Request.Header.Get("Forwarded-For"); pIPs != "" {
+		pIPList = strings.Split(pIPs, ",")
+		ip = strings.TrimSpace(pIPList[0])
 
-	} else if pIps = rc.Context.Request.Header.Get("Forwarded"); pIps != "" {
-		pIpList = strings.Split(pIps, ",")
-		ip = strings.TrimSpace(pIpList[0])
+	} else if pIPs = rc.Context.Request.Header.Get("Forwarded"); pIPs != "" {
+		pIPList = strings.Split(pIPs, ",")
+		ip = strings.TrimSpace(pIPList[0])
 
 	} else {
 		ip = rc.Context.Request.RemoteAddr
