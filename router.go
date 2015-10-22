@@ -15,11 +15,7 @@ type Router interface {
 type route struct {
 	path string // Original route
 
-	parsed string // Cleaned route
-
-	routeParts []string // Route splited in parts
-
-	requestParts []string // Pre-allocate the parts of the request url
+	routeParts []string // parsed Route split into parts
 
 	handler ResourceHandler // Handler for the route
 }
@@ -29,72 +25,37 @@ type route struct {
 //	- url string 		// The route path to handle
 //	- h	ResourceHandler	// The ResourceHandler object that will process the requests to the url.
 //
-func Route(url string, h ResourceHandler) *route {
-	r := new(route)
-	r.path = url
-	r.handler = h
-
-	// Clean initial and trailing "/" from url
-	for strings.HasPrefix(url, "/") {
-		url = strings.TrimPrefix(url, "/")
+func Route(url string, h ResourceHandler) Router {
+	return &route{
+		path:       url,
+		handler:    h,
+		routeParts: prepareUrl(url),
 	}
-	for strings.HasSuffix(url, "/") {
-		url = strings.TrimSuffix(url, "/")
-	}
-	r.parsed = url
-
-	// Split route parts
-	r.routeParts = strings.Split(r.parsed, "/")
-
-	return r
 }
 
-// Match returns true/false indicating if a request URL matches the route.
+// Match returns true/false indicating if a request URL matches the route and
+// sets the Context Params for matching parts in the original route.
 // Route matchs are exact, that means, there are not optional parameters.
 // To implement optional parameters you can define different routes handled by the same ResourceHandler.
 // When a route matches the request URL, this method will parse and fill
 // the parameters parsed during the process into the Context object.
 func (r *route) Match(url string, c *Context) bool {
-	// Clean initial and trailing "/" from request url
-	for strings.HasPrefix(url, "/") {
-		url = strings.TrimPrefix(url, "/")
-	}
-	for strings.HasSuffix(url, "/") {
-		url = strings.TrimSuffix(url, "/")
-	}
-
-	// Split url parts
-	r.requestParts = strings.Split(url, "/")
-
-	// Remove empty parts
-	for i, p := range r.routeParts {
-		if p == "" {
-			r.routeParts = append(r.routeParts[:i], r.routeParts[i+1:]...)
-		}
-	}
-	for i, p := range r.requestParts {
-		if p == "" {
-			r.requestParts = append(r.requestParts[:i], r.requestParts[i+1:]...)
-		}
-	}
+	requestParts := prepareUrl(url)
 
 	// YARF router only accepts exact route matches, so check for part count.
-	if len(r.requestParts) != len(r.routeParts) {
+	if len(r.routeParts) != len(requestParts) {
 		return false
 	}
 
-	// Check for param matching
-	for i, p := range r.routeParts {
-		// Check part
-		if p != r.requestParts[i] && p[:1] != ":" {
-			return false
-		}
+	// check that requestParts matches routeParts
+	if !matches(r.routeParts, requestParts) {
+		return false
 	}
 
 	// Success match. Store params and return true.
 	for i, p := range r.routeParts {
-		if p[:1] == ":" {
-			c.Params.Set(p[1:], r.requestParts[i])
+		if p[0] == ':' {
+			c.Params.Set(p[1:], requestParts[i])
 		}
 	}
 
@@ -147,7 +108,7 @@ func (r *route) Dispatch(c *Context) (err error) {
 type routeGroup struct {
 	prefix string // The url prefix path for all routes in the group
 
-	parsed string // Cleaned prefix used to Match() against request url
+	routeParts []string // parsed Route split into parts
 
 	middleware []MiddlewareHandler // Group middleware resources
 
@@ -162,19 +123,10 @@ type routeGroup struct {
 // so it's possible to add a routeGroup as a route inside another routeGroup.
 // Includes methods to work with middleware.
 func RouteGroup(url string) *routeGroup {
-	r := new(routeGroup)
-	r.prefix = url
-
-	// Clean initial and trailing "/" from url
-	for strings.HasPrefix(url, "/") {
-		url = strings.TrimPrefix(url, "/")
+	return &routeGroup{
+		prefix:     url,
+		routeParts: prepareUrl(url),
 	}
-	for strings.HasSuffix(url, "/") {
-		url = strings.TrimSuffix(url, "/")
-	}
-	r.parsed = url
-
-	return r
 }
 
 // Match loops through all routes inside the group and find for one that matches the request.
@@ -182,52 +134,22 @@ func RouteGroup(url string) *routeGroup {
 // to being able to dispatch it directly after a match without looping again.
 // Outside the box, works exactly the same as route.Match()
 func (g *routeGroup) Match(url string, c *Context) bool {
-	// Clean initial and trailing "/" from request url
-	for strings.HasPrefix(url, "/") {
-		url = strings.TrimPrefix(url, "/")
-	}
-	for strings.HasSuffix(url, "/") {
-		url = strings.TrimSuffix(url, "/")
-	}
+	urlParts := prepareUrl(url)
 
-	// Split parts
-	routeParts := strings.Split(g.parsed, "/")
-	urlParts := strings.Split(url, "/")
-
-	// Remove empty parts
-	for i, p := range routeParts {
-		if p == "" {
-			routeParts = append(routeParts[:i], routeParts[i+1:]...)
-		}
-	}
-	for i, p := range urlParts {
-		if p == "" {
-			urlParts = append(urlParts[:i], urlParts[i+1:]...)
-		}
-	}
-
-	// Check for enough parts on the request
-	if len(urlParts) < len(routeParts) {
+	// check if urlParts matches routeParts
+	if !matches(g.routeParts, urlParts) {
 		return false
 	}
 
-	// Check for param matching
-	for i, p := range routeParts {
-		// Check part
-		if p != urlParts[i] && p[:1] != ":" {
-			return false
-		}
-	}
-
 	// Success match. Store group params.
-	for i, p := range routeParts {
-		if p[:1] == ":" {
+	for i, p := range g.routeParts {
+		if p[0] == ':' {
 			c.Params.Set(p[1:], urlParts[i])
 		}
 	}
 
 	// Remove prefix part form the request URL
-	rURL := strings.Join(urlParts[len(routeParts):], "/")
+	rURL := strings.Join(urlParts[len(g.routeParts):], "/")
 
 	// Now look for a match inside the routes collection
 	for _, r := range g.routes {
@@ -294,4 +216,51 @@ func (g *routeGroup) AddGroup(r *routeGroup) {
 // Insert adds a MiddlewareHandler into the middleware list of the group object.
 func (g *routeGroup) Insert(m MiddlewareHandler) {
 	g.middleware = append(g.middleware, m)
+}
+
+// prepareUrl trims leading and trailing slahses, splits url parts, and removes empty parts
+func prepareUrl(url string) []string {
+	return removeEmpty(strings.Split(trimSlash(url), "/"))
+}
+
+// trimSlash cleans all leading and trailing "/" from request url
+func trimSlash(url string) string {
+	for len(url) > 0 && url[0] == '/' {
+		url = url[1:]
+	}
+	for len(url) > 0 && url[len(url)-1] == '/' {
+		url = url[:len(url)-1]
+	}
+	return url
+}
+
+// removeEmpty removes blank strings from parts in one pass, shifting elements
+// of the array down, and returns the altered array.
+func removeEmpty(parts []string) []string {
+	i := 0
+	for j, p := range parts {
+		if p == "" {
+			continue
+		}
+		parts[i] = parts[j]
+		i++
+	}
+	return parts[:i]
+}
+
+// matches returns true if requestParts matches routeParts up through len(routeParts)
+// ignoring params in routeParts
+func matches(routeParts, requestParts []string) bool {
+	if len(requestParts) < len(routeParts) {
+		return false
+	}
+
+	// Check for part matching, ignoring params
+	for i, p := range routeParts {
+		if p != requestParts[i] && p[0] != ':' {
+			return false
+		}
+	}
+
+	return true
 }
