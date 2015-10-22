@@ -276,6 +276,22 @@ func TestRouterGroupNotMatch(t *testing.T) {
 	}
 }
 
+func TestRouterGroupParams(t *testing.T) {
+	h := &Handler{}
+	c := &Context{Params: url.Values{}}
+
+	g := RouteGroup("/test/:param/")
+	g.Add("/blah", h)
+
+	if g.Match("/test/arg1/nomatch", c) {
+		t.Errorf("shouldn't match")
+	}
+
+	if len(c.Params) > 0 {
+		t.Errorf("RouteGroup should not write params if children did not match: %v", c.Params)
+	}
+}
+
 func TestRouterNestedGroupMatch(t *testing.T) {
 	// Create empty handler
 	h := new(Handler)
