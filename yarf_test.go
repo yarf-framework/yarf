@@ -1,6 +1,8 @@
 package yarf
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"testing"
 )
 
@@ -64,5 +66,55 @@ func TestYarfInsert(t *testing.T) {
 	}
 	if y.middleware[0] != m {
 		t.Fatal("Added a middleware. Stored one seems to be different")
+	}
+}
+
+func TestYarfCache(t *testing.T) {
+	y := New()
+
+	if len(y.cache) > 0 {
+		t.Error("yarf.cache should be empty after initialization")
+	}
+
+	r := new(MockResource)
+	y.Add("/test", r)
+
+	req, _ := http.NewRequest("GET", "http://localhost:8080/route/not/match", nil)
+	res := httptest.NewRecorder()
+	y.ServeHTTP(res, req)
+
+	if len(y.cache) > 0 {
+		t.Error("yarf.cache should be empty after non-matching request")
+	}
+
+	req, _ = http.NewRequest("GET", "http://localhost:8080/test", nil)
+	y.ServeHTTP(res, req)
+
+	if len(y.cache) != 1 {
+		t.Error("yarf.cache should have 1 item after matching request")
+	}
+
+	for i := 0; i < 100; i++ {
+		y.ServeHTTP(res, req)
+	}
+
+	if len(y.cache) != 1 {
+		t.Error("yarf.cache should have 1 item after multiple matching requests to a single route")
+	}
+}
+
+func TestYarfUseCacheFalse(t *testing.T) {
+	y := New()
+	y.UseCache = false
+
+	r := new(MockResource)
+	y.Add("/test", r)
+
+	req, _ := http.NewRequest("GET", "http://localhost:8080/test", nil)
+	res := httptest.NewRecorder()
+	y.ServeHTTP(res, req)
+
+	if len(y.cache) > 0 {
+		t.Error("yarf.cache should be empty after matching request with yarf.UseCache = false")
 	}
 }
