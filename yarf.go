@@ -94,7 +94,9 @@ func (y *yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	for _, r := range y.routes {
 		if r.Match(req.URL.Path, c) {
 			// Store cache
-			y.cache[req.URL.Path] = routeCache{r, c.Params}
+			if y.UseCache {
+				y.cache[req.URL.Path] = routeCache{r, c.Params}
+			}
 
 			// Dispatch and stop
 			y.dispatch(r, c)
