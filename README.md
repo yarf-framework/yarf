@@ -344,24 +344,24 @@ func main() {
 
 Why not?
 
-Now, seriously, i've researched for small/fast frameworks in the past for a Go project that I was starting. 
+No, seriously, i've researched for small/fast frameworks in the past for a Go project that I was starting. 
 I found several options, but at the same time, none seemed to suit me. 
-Some of them makes you write weird function wrappers to fit the net/http package style. 
-Actually, most of them seems to be function-based handlers. 
-While that's not wrong, i feel more comfortable with the resource-based design that also i feel matches better the REST spirit. 
+Some of them make you write weird function wrappers to fit the net/http package style. 
+Actually, most of them seem to be function-based handlers. 
+While that's not wrong, I feel more comfortable with the resource-based design, and this I also feel aligns better with the spirit of REST. 
 
 In Yarf you create a resource struct that represents a REST resource and it has all HTTP methods available. 
 No need to create different routes for GET/POST/DELETE/etc. methods. 
 
 By using composition, you don't need to wrap functions inside functions over and over again to implement simple things like middleware or extension to your methods. 
-You can abuse on composition to create a huge OO-like design for your business model without sacrifying performance and code readability. 
+You can abuse composition to create a huge OO-like design for your business model without sacrifying performance and code readability. 
  
-Even when the code style differs from the net/http package, the framework is fully compatible with it and couldn't run without it. 
+Even while the code style differs from the net/http package, the framework is fully compatible with it and couldn't run without it. 
 Extensions and utilities from other frameworks or even the net/http package can be easily implemented into Yarf by just wraping them up into a Resource, 
-just as you would do on another framework by wrapping functions.
+just as you would do on any other framework by wrapping functions.
   
 Context handling also shows some weird designs across frameworks. Some of them rely on reflection to receive any kind of handlers and context types. 
 Others make you receive some extra parameter in the handler function that actually brokes the net/http compatibility, and you have to carry that context parameter through all middleware/handler-wrapper functions just to make it available. 
 In Yarf, the Context is part of the Resource object and the framework takes care of setting it and make it available for use. 
 
-For all the reasons above and some others, is why there is a new framework in town. 
+For all the reasons above, among some others, there is a new framework in town. 
