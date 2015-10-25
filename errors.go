@@ -54,11 +54,12 @@ type UnexpectedError struct {
 
 // ErrorUnexpected creates UnexpectedError
 func ErrorUnexpected() *UnexpectedError {
-	return &UnexpectedError{
-		httpCode:  http.StatusInternalServerError,
-		errorCode: 0,
-		errorMsg:  "Unexpected error",
-	}
+	e := new(UnexpectedError)
+	e.httpCode = http.StatusInternalServerError
+	e.errorCode = 0
+	e.errorMsg = "Unexpected error"
+
+	return e
 }
 
 // MethodNotImplementedError is used to communicate that a specific HTTP method isn't implemented by a resource.
@@ -68,11 +69,12 @@ type MethodNotImplementedError struct {
 
 // ErrorMethodNotImplemented creates MethodNotImplementedError
 func ErrorMethodNotImplemented() *MethodNotImplementedError {
-	return &MethodNotImplementedError{
-		httpCode:  http.StatusMethodNotAllowed,
-		errorCode: 1,
-		errorMsg:  "Method not implemented",
-	}
+	e := new(MethodNotImplementedError)
+	e.httpCode = http.StatusMethodNotAllowed
+	e.errorCode = 1
+	e.errorMsg = "Method not implemented"
+
+	return e
 }
 
 // NotFoundError is the HTTP 404 error equivalent.
@@ -82,9 +84,10 @@ type NotFoundError struct {
 
 // ErrorNotFound creates NotFoundError
 func ErrorNotFound() *NotFoundError {
-	return &NotFoundError{
-		httpCode:  http.StatusNotFound,
-		errorCode: 2,
-		errorMsg:  "Not found",
-	}
+	e := new(NotFoundError)
+	e.httpCode = http.StatusNotFound
+	e.errorCode = 2
+	e.errorMsg = "Not found"
+
+	return e
 }
