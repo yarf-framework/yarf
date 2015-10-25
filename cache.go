@@ -17,7 +17,7 @@ type Cache struct {
 	storage map[string]routeCache
 
 	// Sync Mutex
-	mtx sync.Mutex
+	sync.RWMutex
 }
 
 func NewCache() *Cache {
@@ -27,16 +27,16 @@ func NewCache() *Cache {
 }
 
 func (c *Cache) Get(k string) (rc routeCache, ok bool) {
-	c.mtx.Lock()
-	defer c.mtx.Unlock()
+	c.RLock()
+	defer c.RUnlock()
 
 	rc, ok = c.storage[k]
 	return
 }
 
 func (c *Cache) Set(k string, r routeCache) {
-	c.mtx.Lock()
-	defer c.mtx.Unlock()
+	c.Lock()
+	defer c.Unlock()
 
 	c.storage[k] = r
 }
