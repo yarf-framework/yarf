@@ -1,4 +1,5 @@
 language: go
+script: go test -v -race ./...
 
 go:
   - 1.5.1
