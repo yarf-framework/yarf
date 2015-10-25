@@ -33,8 +33,8 @@ type Hello struct {
 }
 
 // Implement the GET method
-func (h *Hello) Get() error {
-    h.Render("Hello world!")
+func (h *Hello) Get(c *yarf.Context) error {
+    c.Render("Hello world!")
     
     return nil
 }
@@ -75,8 +75,8 @@ type Hello struct {
 }
 
 // Implement the GET method
-func (h *Hello) Get() error {
-    h.Render("Hello world!")
+func (h *Hello) Get(c *yarf.Context) error {
+    c.Render("Hello world!")
     
     return nil
 }
@@ -121,7 +121,7 @@ You can define optional parameters using multiple routes on the same Resource.
 ### Route parameters
 
 At this point you know how to define parameters in your routes using the /:param naming convention. 
-Now you'll see how easy is to get these parameters by their name from your resources using the .Param() method. 
+Now you'll see how easy is to get these parameters by their name from your resources using the Context.Param() method. 
 
 Example: 
 
@@ -140,10 +140,10 @@ type Hello struct {
     yarf.Resource
 }
 
-func (h *Hello) Get() error {
-    name := h.Param("name")
+func (h *Hello) Get(c *yarf.Context) error {
+    name := c.Param("name")
 
-    h.Render("Hello, " + name)
+    c.Render("Hello, " + name)
 
     return nil
 }
@@ -153,12 +153,9 @@ func (h *Hello) Get() error {
 
 ### Context
 
-The Context object is a property of a Resource and it will be always available for you with the Context information about the ongoing request. 
+The Context object is passed as a parameter to all Resource methods and contains all the information related to the ongoing request. 
 
 Check the Context docs for a reference of the object: [https://godoc.org/github.com/yarf-framework/yarf#Context](https://godoc.org/github.com/yarf-framework/yarf#Context)
-
-Also check the RequestContext docs, for a reference of the methods available to work with Context data from your handlers: [https://godoc.org/github.com/yarf-framework/yarf#RequestContext](https://godoc.org/github.com/yarf-framework/yarf#RequestContext) 
-All Resource objects implements (via composition) the RequestContext object. 
 
 
 
@@ -178,8 +175,8 @@ type HelloMiddleware struct {
 }
 
 // Implement only the PreDispatch method, PostDispatch not needed.
-func (m *HelloMiddleware) PreDispatch() error {
-    m.Render("Hello from middleware! \n") // Render to response.
+func (m *HelloMiddleware) PreDispatch(c *yarf.Context) error {
+    c.Render("Hello from middleware! \n") // Render to response.
 
     return nil
 }
@@ -362,6 +359,6 @@ just as you would do on any other framework by wrapping functions.
   
 Context handling also shows some weird designs across frameworks. Some of them rely on reflection to receive any kind of handlers and context types. 
 Others make you receive some extra parameter in the handler function that actually brokes the net/http compatibility, and you have to carry that context parameter through all middleware/handler-wrapper functions just to make it available. 
-In Yarf, the Context is part of the Resource object and the framework takes care of setting it and make it available for use. 
+In Yarf, the Context is automatically sent as a parameter to all Resource methods by the framework. 
 
 For all the reasons above, among some others, there is a new framework in town. 
