@@ -8,14 +8,14 @@ type Hello struct {
 	yarf.Middleware
 }
 
-func (m *Hello) PreDispatch() error {
-	m.Render("Hello from middleware! \n\n")
+func (m *Hello) PreDispatch(c *yarf.Context) error {
+	c.Render("Hello from middleware! \n\n")
 
 	return nil
 }
 
-func (m *Hello) PostDispatch() error {
-	m.Render("\n\nGoodbye from middleware!")
+func (m *Hello) PostDispatch(c *yarf.Context) error {
+	c.Render("\n\nGoodbye from middleware!")
 
 	return nil
 }

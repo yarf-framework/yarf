@@ -10,8 +10,8 @@ type Hello struct {
 }
 
 // Implement the GET handler
-func (h *Hello) Get() error {
-	h.Render("Hello world!")
+func (h *Hello) Get(c *yarf.Context) error {
+	c.Render("Hello world!")
 
 	return nil
 }

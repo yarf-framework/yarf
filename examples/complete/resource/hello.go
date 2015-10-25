@@ -9,8 +9,8 @@ type Hello struct {
 }
 
 // Implement the GET handler with optional name parameter
-func (h *Hello) Get() error {
-	name := h.Param("name")
+func (h *Hello) Get(c *yarf.Context) error {
+	name := c.Param("name")
 
 	salute := "Hello"
 	if name != "" {
@@ -18,7 +18,7 @@ func (h *Hello) Get() error {
 	}
 	salute += "!"
 
-	h.Render(salute)
+	c.Render(salute)
 
 	return nil
 }

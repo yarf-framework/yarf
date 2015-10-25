@@ -15,8 +15,8 @@ type Static struct {
 }
 
 // Implement the static files handler
-func (s *Static) Get() error {
-	http.FileServer(http.Dir(s.path)).ServeHTTP(s.Context.Response, s.Context.Request)
+func (s *Static) Get(c *yarf.Context) error {
+	http.FileServer(http.Dir(s.path)).ServeHTTP(c.Response, c.Request)
 
 	return nil
 }

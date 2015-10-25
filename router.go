@@ -58,45 +58,40 @@ func (r *route) Match(url string, c *Context) bool {
 }
 
 // Dispatch executes the right ResourceHandler method based on the HTTP request in the Context object.
-func (r *route) Dispatch(c *Context) (err error) {
-	// Add Context to handler
-	r.handler.SetContext(c)
-
+func (r *route) Dispatch(c *Context) error {
 	// Method dispatch
 	switch c.Request.Method {
 	case "GET":
-		err = r.handler.Get()
+		return r.handler.Get(c)
 
 	case "POST":
-		err = r.handler.Post()
+		return r.handler.Post(c)
 
 	case "PUT":
-		err = r.handler.Put()
+		return r.handler.Put(c)
 
 	case "PATCH":
-		err = r.handler.Patch()
+		return r.handler.Patch(c)
 
 	case "DELETE":
-		err = r.handler.Delete()
+		return r.handler.Delete(c)
 
 	case "OPTIONS":
-		err = r.handler.Options()
+		return r.handler.Options(c)
 
 	case "HEAD":
-		err = r.handler.Head()
+		return r.handler.Head(c)
 
 	case "TRACE":
-		err = r.handler.Trace()
+		return r.handler.Trace(c)
 
 	case "CONNECT":
-		err = r.handler.Connect()
+		return r.handler.Connect(c)
 
-	default:
-		err = ErrorMethodNotImplemented()
 	}
 
-	// Return error status
-	return
+	// Return method not implemented
+	return ErrorMethodNotImplemented()
 }
 
 // routeGroup stores routes grouped under a single url prefix.
@@ -108,8 +103,6 @@ type routeGroup struct {
 	middleware []MiddlewareHandler // Group middleware resources
 
 	routes []Router // Group routes
-
-	lastMatch Router // Stores last matched route to be dispatched.
 }
 
 // RouteGroup creates a new routeGroup object and initializes it with the provided url prefix.
@@ -125,7 +118,7 @@ func RouteGroup(url string) *routeGroup {
 }
 
 // Match loops through all routes inside the group and find for one that matches the request.
-// After a match is found, the route matching is stored into lastMatch
+// After a match is found, the route matching is stored into Context.groupDispatch
 // to being able to dispatch it directly after a match without looping again.
 // Outside the box, works exactly the same as route.Match()
 func (g *routeGroup) Match(url string, c *Context) bool {
@@ -143,7 +136,7 @@ func (g *routeGroup) Match(url string, c *Context) bool {
 	for _, r := range g.routes {
 		if r.Match(rURL, c) {
 			// store the matching Router and params after a match is found
-			g.lastMatch = r
+			c.groupDispatch = r
 			storeParams(c, g.routeParts, urlParts)
 			return true
 		}
@@ -155,24 +148,21 @@ func (g *routeGroup) Match(url string, c *Context) bool {
 // Dispatch loops through all routes inside the group and dispatch the one that matches the request.
 // Outside the box, works exactly the same as route.Dispatch().
 func (g *routeGroup) Dispatch(c *Context) (err error) {
-	if g.lastMatch == nil {
+	if c.groupDispatch == nil {
 		return errors.New("No matching route found")
 	}
 
 	// Pre-dispatch middleware
 	for _, m := range g.middleware {
-		// Add context to middleware
-		m.SetContext(c)
-
 		// Dispatch
-		err = m.PreDispatch()
+		err = m.PreDispatch(c)
 		if err != nil {
 			return
 		}
 	}
 
 	// Dispatch route
-	err = g.lastMatch.Dispatch(c)
+	err = c.groupDispatch.Dispatch(c)
 	if err != nil {
 		return
 	}
@@ -180,7 +170,7 @@ func (g *routeGroup) Dispatch(c *Context) (err error) {
 	// Post-dispatch middleware
 	for _, m := range g.middleware {
 		// Dispatch
-		err = m.PostDispatch()
+		err = m.PostDispatch(c)
 		if err != nil {
 			return
 		}

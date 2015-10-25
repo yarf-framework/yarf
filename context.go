@@ -39,6 +39,9 @@ type Context struct {
 
 	// Free storage to be used freely by apps to their convenience.
 	Data ContextData
+
+	// Group route storage for dispatch
+	groupDispatch Router
 }
 
 // NewContext instantiates a new *Context object with default values and returns it.
@@ -50,59 +53,48 @@ func NewContext(r *http.Request, rw http.ResponseWriter) *Context {
 	}
 }
 
-// RequestContext implements Context related methods to interact with the Context object.
-// It's used to composite into Resource and Middleware to satisfy the interfaces.
-type RequestContext struct {
-	Context *Context
-}
-
-// SetContext setter
-func (rc *RequestContext) SetContext(c *Context) {
-	rc.Context = c
-}
-
 // Status sets the HTTP status code to be returned on the response.
-func (rc *RequestContext) Status(code int) {
-	rc.Context.Response.WriteHeader(code)
+func (c *Context) Status(code int) {
+	c.Response.WriteHeader(code)
 }
 
-// Param is a wrapper for rc.Context.Params.Get()
-func (rc *RequestContext) Param(name string) string {
-	return rc.Context.Params.Get(name)
+// Param is a wrapper for c.Params.Get()
+func (c *Context) Param(name string) string {
+	return c.Params.Get(name)
 }
 
 // GetClientIP retrieves the client IP address from the request information.
 // It detects common proxy headers to return the actual client's IP and not the proxy's.
-func (rc *RequestContext) GetClientIP() (ip string) {
+func (c *Context) GetClientIP() (ip string) {
 	var pIPs string
 	var pIPList []string
 
-	if pIPs = rc.Context.Request.Header.Get("X-Real-Ip"); pIPs != "" {
+	if pIPs = c.Request.Header.Get("X-Real-Ip"); pIPs != "" {
 		pIPList = strings.Split(pIPs, ",")
 		ip = strings.TrimSpace(pIPList[0])
 
-	} else if pIPs = rc.Context.Request.Header.Get("Real-Ip"); pIPs != "" {
+	} else if pIPs = c.Request.Header.Get("Real-Ip"); pIPs != "" {
 		pIPList = strings.Split(pIPs, ",")
 		ip = strings.TrimSpace(pIPList[0])
 
-	} else if pIPs = rc.Context.Request.Header.Get("X-Forwarded-For"); pIPs != "" {
+	} else if pIPs = c.Request.Header.Get("X-Forwarded-For"); pIPs != "" {
 		pIPList = strings.Split(pIPs, ",")
 		ip = strings.TrimSpace(pIPList[0])
 
-	} else if pIPs = rc.Context.Request.Header.Get("X-Forwarded"); pIPs != "" {
+	} else if pIPs = c.Request.Header.Get("X-Forwarded"); pIPs != "" {
 		pIPList = strings.Split(pIPs, ",")
 		ip = strings.TrimSpace(pIPList[0])
 
-	} else if pIPs = rc.Context.Request.Header.Get("Forwarded-For"); pIPs != "" {
+	} else if pIPs = c.Request.Header.Get("Forwarded-For"); pIPs != "" {
 		pIPList = strings.Split(pIPs, ",")
 		ip = strings.TrimSpace(pIPList[0])
 
-	} else if pIPs = rc.Context.Request.Header.Get("Forwarded"); pIPs != "" {
+	} else if pIPs = c.Request.Header.Get("Forwarded"); pIPs != "" {
 		pIPList = strings.Split(pIPs, ",")
 		ip = strings.TrimSpace(pIPList[0])
 
 	} else {
-		ip = rc.Context.Request.RemoteAddr
+		ip = c.Request.RemoteAddr
 	}
 
 	return strings.Split(ip, ":")[0]
@@ -111,51 +103,51 @@ func (rc *RequestContext) GetClientIP() (ip string) {
 // Render writes a string to the http.ResponseWriter.
 // This is the default renderer that just sends the string to the client.
 // Check other Render[Type] functions for different types.
-func (rc *RequestContext) Render(content string) {
+func (c *Context) Render(content string) {
 	// Write response
-	rc.Context.Response.Write([]byte(content))
+	c.Response.Write([]byte(content))
 }
 
 // RenderJSON takes a interface{} object and writes the JSON encoded string of it.
-func (rc *RequestContext) RenderJSON(data interface{}) {
+func (c *Context) RenderJSON(data interface{}) {
 	// Set content
 	encoded, err := json.Marshal(data)
 	if err != nil {
-		rc.Context.Response.Write([]byte(err.Error()))
+		c.Response.Write([]byte(err.Error()))
 	} else {
-		rc.Context.Response.Write(encoded)
+		c.Response.Write(encoded)
 	}
 }
 
 // RenderJSONIndent is the indented (beauty) of RenderJSON
-func (rc *RequestContext) RenderJSONIndent(data interface{}) {
+func (c *Context) RenderJSONIndent(data interface{}) {
 	// Set content
 	encoded, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
-		rc.Context.Response.Write([]byte(err.Error()))
+		c.Response.Write([]byte(err.Error()))
 	} else {
-		rc.Context.Response.Write(encoded)
+		c.Response.Write(encoded)
 	}
 }
 
 // RenderXML takes a interface{} object and writes the XML encoded string of it.
-func (rc *RequestContext) RenderXML(data interface{}) {
+func (c *Context) RenderXML(data interface{}) {
 	// Set content
 	encoded, err := xml.Marshal(data)
 	if err != nil {
-		rc.Context.Response.Write([]byte(err.Error()))
+		c.Response.Write([]byte(err.Error()))
 	} else {
-		rc.Context.Response.Write(encoded)
+		c.Response.Write(encoded)
 	}
 }
 
 // RenderXMLIndent is the indented (beauty) of RenderXML
-func (rc *RequestContext) RenderXMLIndent(data interface{}) {
+func (c *Context) RenderXMLIndent(data interface{}) {
 	// Set content
 	encoded, err := xml.MarshalIndent(data, "", "  ")
 	if err != nil {
-		rc.Context.Response.Write([]byte(err.Error()))
+		c.Response.Write([]byte(err.Error()))
 	} else {
-		rc.Context.Response.Write(encoded)
+		c.Response.Write(encoded)
 	}
 }

@@ -11,8 +11,8 @@ type Panic struct {
 }
 
 // Implement a GET handler that panics
-func (p *Panic) Get() error {
-	p.Render("I'm panicking!")
+func (p *Panic) Get(c *yarf.Context) error {
+	c.Render("I'm panicking!")
 
 	panic("Totally panicking!")
 

@@ -2,17 +2,10 @@ package yarf
 
 import (
 	"net/http"
-	"net/url"
 )
 
 // Framework version string
-const Version = "0.5"
-
-// routeCache stores previously matched and parsed routes
-type routeCache struct {
-	route  Router
-	params url.Values
-}
+const Version = "0.6"
 
 // yarf is the main entry point for the framework and it centralizes most of the functionality.
 // All configuration actions are handled by this object.
@@ -36,7 +29,7 @@ type yarf struct {
 	routes []Router
 
 	// Cached routes storage
-	cache map[string]routeCache
+	cache *Cache
 
 	// Middleware resources
 	middleware []MiddlewareHandler
@@ -49,7 +42,7 @@ func New() *yarf {
 
 	// Init cache
 	y.UseCache = true
-	y.cache = make(map[string]routeCache)
+	y.cache = NewCache()
 
 	// Return object
 	return y
@@ -78,9 +71,12 @@ func (y *yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	// The Context pointer will be affected by the middleware and resources.
 	c := NewContext(req, res)
 
+	// Init error
+	var err error
+
 	// Cached routes
 	if y.UseCache {
-		if cache, ok := y.cache[req.URL.Path]; ok {
+		if cache, ok := y.cache.Get(req.URL.Path); ok {
 			// Set context params
 			c.Params = cache.params
 
@@ -92,15 +88,17 @@ func (y *yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	// Route match
 	for _, r := range y.routes {
-		if r.Match(req.URL.Path, c) {
-			// Store cache
-			if y.UseCache {
-				y.cache[req.URL.Path] = routeCache{r, c.Params}
-			}
+		if err == nil {
+			if r.Match(req.URL.Path, c) {
+				// Store cache
+				if y.UseCache {
+					y.cache.Set(req.URL.Path, routeCache{r, c.Params})
+				}
 
-			// Dispatch and stop
-			y.dispatch(r, c)
-			return
+				// Dispatch and stop
+				y.dispatch(r, c)
+				return
+			}
 		}
 	}
 
@@ -119,11 +117,8 @@ func (y *yarf) dispatch(r Router, c *Context) {
 
 	// Pre-Dispatch Middleware
 	for _, m := range y.middleware {
-		// Add context to middleware
-		m.SetContext(c)
-
 		// Dispatch
-		err = m.PreDispatch()
+		err = m.PreDispatch(c)
 		if err != nil {
 			// Stop on error
 			break
@@ -137,7 +132,7 @@ func (y *yarf) dispatch(r Router, c *Context) {
 		if err == nil {
 			// Post-Dispatch Middleware
 			for _, m := range y.middleware {
-				err = m.PostDispatch()
+				err = m.PostDispatch(c)
 				if err != nil {
 					// Stop on error
 					break
