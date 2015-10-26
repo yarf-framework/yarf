@@ -11,6 +11,14 @@ type Router interface {
 	Dispatch(*Context) error
 }
 
+// GroupRouter interface adds methods to work with children routers
+type GroupRouter interface {
+	Router
+	Add(string, ResourceHandler)
+	AddGroup(*routeGroup)
+	Insert(MiddlewareHandler)
+}
+
 // route struct stores the expected route path and the ResourceHandler that handles that route.
 type route struct {
 	path string // Original route
