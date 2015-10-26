@@ -144,7 +144,7 @@ func (g *routeGroup) Match(url string, c *Context) bool {
 	for _, r := range g.routes {
 		if r.Match(rURL, c) {
 			// store the matching Router and params after a match is found
-			c.groupDispatch = r
+			c.groupDispatch = append(c.groupDispatch, r)
 			storeParams(c, g.routeParts, urlParts)
 			return true
 		}
@@ -156,7 +156,7 @@ func (g *routeGroup) Match(url string, c *Context) bool {
 // Dispatch loops through all routes inside the group and dispatch the one that matches the request.
 // Outside the box, works exactly the same as route.Dispatch().
 func (g *routeGroup) Dispatch(c *Context) (err error) {
-	if c.groupDispatch == nil {
+	if len(c.groupDispatch) == 0 {
 		return errors.New("No matching route found")
 	}
 
@@ -169,8 +169,11 @@ func (g *routeGroup) Dispatch(c *Context) (err error) {
 		}
 	}
 
-	// Dispatch route
-	err = c.groupDispatch.Dispatch(c)
+	// pop, dispatch last route
+	n := len(c.groupDispatch) - 1
+	route := c.groupDispatch[n]
+	c.groupDispatch = c.groupDispatch[:n]
+	err = route.Dispatch(c)
 	if err != nil {
 		return
 	}

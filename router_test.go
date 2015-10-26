@@ -1,6 +1,7 @@
 package yarf
 
 import (
+	"net/http"
 	"net/url"
 	"testing"
 )
@@ -282,6 +283,25 @@ func TestRouteGroupInsert(t *testing.T) {
 	}
 	if y.middleware[0] != m {
 		t.Fatal("Added a middleware. Stored one seems to be different")
+	}
+}
+
+func TestRouterGroupDispatch(t *testing.T) {
+	g1 := RouteGroup("one")
+	g2 := RouteGroup("two")
+
+	g1.AddGroup(g2)
+	g2.Add("test", &Handler{})
+
+	c := &Context{Params: url.Values{}, Request: &http.Request{}}
+
+	if !g1.Match("one/two/test", c) {
+		t.Errorf("Route did not match")
+	}
+
+	err := g1.Dispatch(c)
+	if _, ok := err.(*MethodNotImplementedError); !ok {
+		t.Errorf("Dispatch failed: %s", err)
 	}
 }
 
