@@ -41,7 +41,7 @@ type Context struct {
 	Data ContextData
 
 	// Group route storage for dispatch
-	groupDispatch Router
+	groupDispatch []Router
 }
 
 // NewContext instantiates a new *Context object with default values and returns it.

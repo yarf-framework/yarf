@@ -1,6 +1,7 @@
 package yarf
 
 import (
+	"net/http"
 	"net/url"
 	"testing"
 )
@@ -227,6 +228,80 @@ func TestRouterMultiLevelParamUnmatch(t *testing.T) {
 		if r.Match(s, c) {
 			t.Errorf("'%s' shouldn't match against '/a/b/:param'", s)
 		}
+	}
+}
+
+func TestRouteGroupAdd(t *testing.T) {
+	y := RouteGroup("")
+	r := new(MockResource)
+
+	y.Add("/test", r)
+
+	if len(y.routes) != 1 {
+		t.Fatalf("Added 1 route, found %d in the list.", len(y.routes))
+	}
+	if y.routes[0].(*route).path != "/test" {
+		t.Fatalf("Added /test path. Found %s", y.routes[0].(*route).path)
+	}
+	if y.routes[0].(*route).handler != r {
+		t.Fatal("Added a Handler. Handler found seems to be different")
+	}
+
+	y.Add("/test/2", r)
+
+	if len(y.routes) != 2 {
+		t.Fatalf("Added 2 routes, found %d routes in the list.", len(y.routes))
+	}
+
+	if y.routes[0].(*route).handler != y.routes[1].(*route).handler {
+		t.Fatal("Added a Handler to 2 routes. Handlers found seems to be different")
+	}
+}
+
+func TestRouteGroupAddGroup(t *testing.T) {
+	y := RouteGroup("")
+	g := RouteGroup("/group")
+
+	y.AddGroup(g)
+
+	if len(y.routes) != 1 {
+		t.Fatalf("Added 1 route group, found %d in the list.", len(y.routes))
+	}
+	if y.routes[0].(*routeGroup).prefix != "/group" {
+		t.Fatalf("Added a /group route prefix. Found %s", y.routes[0].(*routeGroup).prefix)
+	}
+}
+
+func TestRouteGroupInsert(t *testing.T) {
+	y := RouteGroup("")
+	m := new(MockMiddleware)
+
+	y.Insert(m)
+
+	if len(y.middleware) != 1 {
+		t.Fatalf("Added 1 middleware, found %d in the list.", len(y.routes))
+	}
+	if y.middleware[0] != m {
+		t.Fatal("Added a middleware. Stored one seems to be different")
+	}
+}
+
+func TestRouterGroupDispatch(t *testing.T) {
+	g1 := RouteGroup("one")
+	g2 := RouteGroup("two")
+
+	g1.AddGroup(g2)
+	g2.Add("test", &Handler{})
+
+	c := &Context{Params: url.Values{}, Request: &http.Request{}}
+
+	if !g1.Match("one/two/test", c) {
+		t.Errorf("Route did not match")
+	}
+
+	err := g1.Dispatch(c)
+	if _, ok := err.(*MethodNotImplementedError); !ok {
+		t.Errorf("Dispatch failed: %s", err)
 	}
 }
 

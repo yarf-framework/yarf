@@ -7,7 +7,7 @@ import (
 
 // routeCache stores previously matched and parsed routes
 type routeCache struct {
-	route  Router
+	route  []Router
 	params url.Values
 }
 
