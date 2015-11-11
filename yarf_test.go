@@ -82,3 +82,18 @@ func TestRace(t *testing.T) {
 		go y.ServeHTTP(res2, two)
 	}
 }
+
+func TestNotFoundResponse(t *testing.T) {
+    y := New()
+
+	r := new(MockResource)
+	y.Add("/test", r)
+
+	req, _ := http.NewRequest("GET", "http://localhost:8080/route/not/match", nil)
+	res := httptest.NewRecorder()
+	y.ServeHTTP(res, req)
+	
+	if res.Code != 404 {
+	    t.Error("Non matching route should return 404 response")
+	}
+}
