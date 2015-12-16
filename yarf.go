@@ -7,9 +7,9 @@ import (
 // Framework version string
 const Version = "0.6"
 
-// yarf is the main entry point for the framework and it centralizes most of the functionality.
+// Yarf is the main entry point for the framework and it centralizes most of the functionality.
 // All configuration actions are handled by this object.
-type yarf struct {
+type Yarf struct {
 	// UseCache indicates if the route cache should be used.
 	UseCache bool
 
@@ -33,8 +33,8 @@ type yarf struct {
 
 // New creates a new yarf and returns a pointer to it.
 // Performs needed initializations
-func New() *yarf {
-	y := new(yarf)
+func New() *Yarf {
+	y := new(Yarf)
 
 	// Init cache
 	y.UseCache = true
@@ -48,7 +48,7 @@ func New() *yarf {
 // ServeHTTP Implements http.Handler interface into yarf.
 // Initializes a Context object and handles middleware and route actions.
 // If an error is returned by any of the actions, the flow is stopped and a response is sent.
-func (y *yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (y *Yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	if y.PanicHandler != nil {
 		defer y.PanicHandler()
 	}
@@ -86,7 +86,7 @@ func (y *yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 }
 
 // errorHandler deals with request errors.
-func (y *yarf) errorHandler(err error, c *Context) {
+func (y *Yarf) errorHandler(err error, c *Context) {
 	// Return if no error or silent mode
 	if err == nil || y.Silent {
 		return
@@ -114,12 +114,12 @@ func (y *yarf) errorHandler(err error, c *Context) {
 
 // Start initiates a new http yarf server and start listening.
 // It's a shortcut for http.ListenAndServe(address, y)
-func (y *yarf) Start(address string) {
+func (y *Yarf) Start(address string) {
 	http.ListenAndServe(address, y)
 }
 
 // StartTLS initiates a new http yarf server and starts listening to HTTPS requests.
 // It is a shortcut for http.ListenAndServeTLS(address, cert, key, yarf)
-func (y *yarf) StartTLS(address, cert, key string) {
+func (y *Yarf) StartTLS(address, cert, key string) {
 	http.ListenAndServeTLS(address, cert, key, y)
 }

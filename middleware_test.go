@@ -1,9 +1,9 @@
 package yarf
 
 import (
-	"testing"
 	"net/http"
 	"net/http/httptest"
+	"testing"
 )
 
 func TestMiddlewareInterface(t *testing.T) {
@@ -17,7 +17,7 @@ func TestMiddlewareInterface(t *testing.T) {
 
 func TestMiddlewareDefaultResponse(t *testing.T) {
 	m := new(Middleware)
-	
+
 	// Create a dummy request.
 	request, _ := http.NewRequest(
 		"GET",
@@ -25,13 +25,13 @@ func TestMiddlewareDefaultResponse(t *testing.T) {
 		nil,
 	)
 	response := httptest.NewRecorder()
-	
+
 	c := NewContext(request, response)
 
 	if m.PreDispatch(c) != nil {
-	    t.Error("Default PreDispatch() implementation should return nil")
+		t.Error("Default PreDispatch() implementation should return nil")
 	}
 	if m.PostDispatch(c) != nil {
-	    t.Error("Default PostDispatch() implementation should return nil")
+		t.Error("Default PostDispatch() implementation should return nil")
 	}
 }
