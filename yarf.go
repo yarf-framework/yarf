@@ -1,6 +1,7 @@
 package yarf
 
 import (
+	"log"
 	"net/http"
 )
 
@@ -29,6 +30,9 @@ type Yarf struct {
 
 	// Cached routes storage
 	cache *Cache
+
+	// Logger object will be used if present
+	Logger *log.Logger
 }
 
 // New creates a new yarf and returns a pointer to it.
@@ -87,6 +91,16 @@ func (y *Yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 // errorHandler deals with request errors.
 func (y *Yarf) log(err error, c *Context) {
+	// If a logger is present, lets log everything.
+	if y.Logger != nil {
+		y.Logger.Printf(
+			"| %s | %s | %s ",
+			c.GetClientIP(),
+			c.Request.Method,
+			c.Request.URL.String(),
+		)
+	}
+
 	// Return if no error or silent mode
 	if err == nil || y.Silent {
 		return
@@ -109,6 +123,15 @@ func (y *Yarf) log(err error, c *Context) {
 
 	if y.Debug {
 		c.Response.Write([]byte(yerr.Body()))
+	}
+
+	// Log errors
+	if y.Logger != nil {
+		y.Logger.Printf(
+			"ERROR: %d | %s ",
+			yerr.Code(),
+			yerr.Body(),
+		)
 	}
 }
 
