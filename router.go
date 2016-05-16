@@ -165,7 +165,7 @@ func (g *routeGroup) Dispatch(c *Context) (err error) {
 		// Dispatch
 		err = m.PreDispatch(c)
 		if err != nil {
-		    g.endDispatch(c)
+			g.endDispatch(c)
 			return
 		}
 	}
@@ -176,7 +176,7 @@ func (g *routeGroup) Dispatch(c *Context) (err error) {
 	c.groupDispatch = c.groupDispatch[:n]
 	err = route.Dispatch(c)
 	if err != nil {
-	    g.endDispatch(c)
+		g.endDispatch(c)
 		return
 	}
 
@@ -185,11 +185,11 @@ func (g *routeGroup) Dispatch(c *Context) (err error) {
 		// Dispatch
 		err = m.PostDispatch(c)
 		if err != nil {
-		    g.endDispatch(c)
+			g.endDispatch(c)
 			return
 		}
 	}
-	
+
 	// End dispatch if no errors blocking...
 	g.endDispatch(c)
 
@@ -198,11 +198,11 @@ func (g *routeGroup) Dispatch(c *Context) (err error) {
 }
 
 func (g *routeGroup) endDispatch(c *Context) (err error) {
-    // End dispatch middleware
+	// End dispatch middleware
 	for _, m := range g.middleware {
-	    err = m.End(c)
+		err = m.End(c)
 	}
-	
+
 	// If there are any error, only return the last to be sure we go through all middlewares.
 	return
 }

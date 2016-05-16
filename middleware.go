@@ -25,7 +25,7 @@ func (m *Middleware) PostDispatch(c *Context) error {
 	return nil
 }
 
-// End will be executed ALWAYS after every request, even if there were errors present. 
+// End will be executed ALWAYS after every request, even if there were errors present.
 func (m *Middleware) End(c *Context) error {
-    return nil
+	return nil
 }
