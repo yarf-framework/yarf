@@ -66,7 +66,7 @@ func (y *Yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 			// Dispatch and stop
 			err := y.Dispatch(c)
-			y.errorHandler(err, c)
+			y.log(err, c)
 			return
 		}
 	}
@@ -77,7 +77,7 @@ func (y *Yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 			y.cache.Set(req.URL.Path, routeCache{c.groupDispatch, c.Params})
 		}
 		err := y.Dispatch(c)
-		y.errorHandler(err, c)
+		y.log(err, c)
 		return
 	}
 
@@ -86,7 +86,7 @@ func (y *Yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 }
 
 // errorHandler deals with request errors.
-func (y *Yarf) errorHandler(err error, c *Context) {
+func (y *Yarf) log(err error, c *Context) {
 	// Return if no error or silent mode
 	if err == nil || y.Silent {
 		return
@@ -97,10 +97,10 @@ func (y *Yarf) errorHandler(err error, c *Context) {
 	if !ok {
 		// Create default 500 error
 		yerr = &CustomError{
-			httpCode:  500,
-			errorCode: 0,
-			errorMsg:  err.Error(),
-			errorBody: err.Error(),
+			HttpCode:  500,
+			ErrorCode: 0,
+			ErrorMsg:  err.Error(),
+			ErrorBody: err.Error(),
 		}
 	}
 

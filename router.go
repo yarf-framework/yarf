@@ -157,6 +157,7 @@ func (g *routeGroup) Match(url string, c *Context) bool {
 // Outside the box, works exactly the same as route.Dispatch().
 func (g *routeGroup) Dispatch(c *Context) (err error) {
 	if len(c.groupDispatch) == 0 {
+		g.endDispatch(c)
 		return errors.New("No matching route found")
 	}
 

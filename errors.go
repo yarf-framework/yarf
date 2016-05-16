@@ -14,37 +14,36 @@ type YError interface {
 
 // CustomError is the standard error response format used through the framework.
 // Implements Error and YError interfaces
-// All custom errors should composite the CustomError in order to let know the framework what to do with each one.
 type CustomError struct {
-	httpCode  int    // HTTP status code to be used as this error response.
-	errorCode int    // Internal YARF error code for further reference.
-	errorMsg  string // YARF error message.
-	errorBody string // Error content to be rendered to the client response.
+	HttpCode  int    // HTTP status code to be used as this error response.
+	ErrorCode int    // Internal YARF error code for further reference.
+	ErrorMsg  string // YARF error message.
+	ErrorBody string // Error content to be rendered to the client response.
 }
 
 // Implements the error interface returning the ErrorMsg value of each error.
 func (e *CustomError) Error() string {
-	return e.errorMsg
+	return e.ErrorMsg
 }
 
 // Code returns the error's HTTP code to be used in the response.
 func (e *CustomError) Code() int {
-	return e.httpCode
+	return e.HttpCode
 }
 
 // ID returns the error's ID for further reference.
 func (e *CustomError) ID() int {
-	return e.errorCode
+	return e.ErrorCode
 }
 
 // Msg returns the error's message, used to implement the Error interface.
 func (e *CustomError) Msg() string {
-	return e.errorMsg
+	return e.ErrorMsg
 }
 
 // Body returns the error's content body, if needed, to be returned in the HTTP response.
 func (e *CustomError) Body() string {
-	return e.errorBody
+	return e.ErrorBody
 }
 
 // UnexpectedError is used when the origin of the error can't be discovered
@@ -55,9 +54,9 @@ type UnexpectedError struct {
 // ErrorUnexpected creates UnexpectedError
 func ErrorUnexpected() *UnexpectedError {
 	e := new(UnexpectedError)
-	e.httpCode = http.StatusInternalServerError
-	e.errorCode = 0
-	e.errorMsg = "Unexpected error"
+	e.HttpCode = http.StatusInternalServerError
+	e.ErrorCode = 0
+	e.ErrorMsg = "Unexpected error"
 
 	return e
 }
@@ -70,9 +69,9 @@ type MethodNotImplementedError struct {
 // ErrorMethodNotImplemented creates MethodNotImplementedError
 func ErrorMethodNotImplemented() *MethodNotImplementedError {
 	e := new(MethodNotImplementedError)
-	e.httpCode = http.StatusMethodNotAllowed
-	e.errorCode = 1
-	e.errorMsg = "Method not implemented"
+	e.HttpCode = http.StatusMethodNotAllowed
+	e.ErrorCode = 1
+	e.ErrorMsg = "Method not implemented"
 
 	return e
 }
@@ -85,9 +84,9 @@ type NotFoundError struct {
 // ErrorNotFound creates NotFoundError
 func ErrorNotFound() *NotFoundError {
 	e := new(NotFoundError)
-	e.httpCode = http.StatusNotFound
-	e.errorCode = 2
-	e.errorMsg = "Not found"
+	e.HttpCode = http.StatusNotFound
+	e.ErrorCode = 2
+	e.ErrorMsg = "Not found"
 
 	return e
 }
