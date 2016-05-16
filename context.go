@@ -63,11 +63,11 @@ func (c *Context) Param(name string) string {
 	return c.Params.Get(name)
 }
 
-// FormValue is a wrapper for c.Request.Form.Get() and calls the c.Request.ParseForm().
+// FormValue is a wrapper for c.Request.Form.Get() and calls the c.Request.ParseForm(). 
 func (c *Context) FormValue(name string) string {
-	c.Request.ParseForm()
-
-	return c.Request.Form.Get(name)
+    c.Request.ParseForm()
+    
+    return c.Request.Form.Get(name)
 }
 
 // GetClientIP retrieves the client IP address from the request information.

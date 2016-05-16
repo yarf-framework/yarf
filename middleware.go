@@ -7,6 +7,7 @@ import ()
 type MiddlewareHandler interface {
 	PreDispatch(*Context) error
 	PostDispatch(*Context) error
+	End(*Context) error
 }
 
 // Middleware struct is the default implementation of a Middleware and does nothing.
@@ -22,4 +23,9 @@ func (m *Middleware) PreDispatch(c *Context) error {
 // PostDispatch includes code to be executed after every Resource request.
 func (m *Middleware) PostDispatch(c *Context) error {
 	return nil
+}
+
+// End will be executed ALWAYS after every request, even if there were errors present. 
+func (m *Middleware) End(c *Context) error {
+    return nil
 }
