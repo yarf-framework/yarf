@@ -34,7 +34,7 @@ type Yarf struct {
 	// Logger object will be used if present
 	Logger *log.Logger
 
-	// Follow defines a standard http.Handler implementation to follow if no route match
+	// Follow defines a standard http.Handler implementation to follow if no route matches.
 	Follow http.Handler
 }
 
@@ -55,6 +55,8 @@ func New() *Yarf {
 // ServeHTTP Implements http.Handler interface into yarf.
 // Initializes a Context object and handles middleware and route actions.
 // If an error is returned by any of the actions, the flow is stopped and a response is sent.
+// If no route matches, tries to forward the request to the Yarf.Follow (http.Handler type) property if set. 
+// Otherwise it returns a 404 response.
 func (y *Yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	if y.PanicHandler != nil {
 		defer y.PanicHandler()
@@ -87,17 +89,21 @@ func (y *Yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		y.log(err, c)
 		return
 	}
-
+    
+    // Log follow
+    y.log(nil, c)
+    
 	// Follow extensions pipe
 	if y.Follow != nil {
-		y.Follow.ServeHTTP(res, req)
+		y.Follow.ServeHTTP(c.Response, c.Request)
+        
+		return
 	}
 
 	// Return 404
 	c.Response.WriteHeader(404)
 }
 
-// errorHandler deals with request errors.
 func (y *Yarf) log(err error, c *Context) {
 	// If a logger is present, lets log everything.
 	if y.Logger != nil {
