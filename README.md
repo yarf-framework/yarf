@@ -337,6 +337,37 @@ func main() {
 
 ```
 
+## Chain and extend
+
+Just use the Yarf object as any http.Handler on a chain. 
+Set another http.Handler on the Yarf.Follow property to be followed in case this Yarf router can't match the request. 
+
+Here's an example on how to follow the request to a public file server: 
+
+```go
+package main 
+
+import (
+    "github.com/yarf-framework/yarf"
+    "net/http"
+)
+
+func main() {
+    y := yarf.New()
+
+    // Add some routes
+    y.Add("/hello/:name", new(Hello))
+    
+    //... more routes here
+    
+    // Follow to file server
+    y.Follow = http.FileServer(http.Dir("/var/www/public"))
+    
+    // Start the server
+    y.Start(":8080")
+}
+```
+
 
 ## Why another micro-framework? 
 

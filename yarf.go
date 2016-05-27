@@ -33,6 +33,9 @@ type Yarf struct {
 
 	// Logger object will be used if present
 	Logger *log.Logger
+
+	// Follow defines a standard http.Handler implementation to follow if no route match
+	Follow http.Handler
 }
 
 // New creates a new yarf and returns a pointer to it.
@@ -83,6 +86,11 @@ func (y *Yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		err := y.Dispatch(c)
 		y.log(err, c)
 		return
+	}
+
+	// Follow extensions pipe
+	if y.Follow != nil {
+		y.Follow.ServeHTTP(res, req)
 	}
 
 	// Return 404
