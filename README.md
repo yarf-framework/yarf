@@ -1,7 +1,7 @@
 [![GoDoc](https://godoc.org/github.com/yarf-framework/yarf?status.svg)](https://godoc.org/github.com/yarf-framework/yarf)
 [![Build Status](https://travis-ci.org/yarf-framework/yarf.svg?branch=master)](https://travis-ci.org/yarf-framework/yarf)
 [![Coverage](http://gocover.io/_badge/github.com/yarf-framework/yarf)](http://gocover.io/github.com/yarf-framework/yarf)
-[![Join the chat at https://gitter.im/jinzhu/gorm](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/yarf-framework) 
+[![Join the chat at https://gitter.im/jinzhu/gorm](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/yarf-framework/yarf) 
 
 
 # YARF: Yet Another REST Framework
