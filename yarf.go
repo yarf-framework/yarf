@@ -78,7 +78,7 @@ func (y *Yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 			// Dispatch and stop
 			err := y.Dispatch(c)
-			y.log(err, c)
+			y.finish(c, err)
 			return
 		}
 	}
@@ -89,30 +89,18 @@ func (y *Yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 			y.cache.Set(req.URL.Path, routeCache{c.groupDispatch, c.Params})
 		}
 		err := y.Dispatch(c)
-		y.log(err, c)
-		return
-	}
-
-	// Follow extensions pipe
-	if y.Follow != nil {
-		// Log follow
-		y.log(nil, c)
-
-		// Follow
-		y.Follow.ServeHTTP(c.Response, c.Request)
-
-		// End here
+		y.finish(c, err)
 		return
 	}
 
 	// Return 404
-	y.log(ErrorNotFound(), c)
+	y.finish(c, ErrorNotFound())
 }
 
-// Log handles the end of the execution.
-// It checks for errors and custom actions to execute.
+// Finish handles the end of the execution.
+// It checks for errors and follow actions to execute.
 // It also handles the custom 404 error handler.
-func (y *Yarf) log(err error, c *Context) {
+func (y *Yarf) finish(c *Context, err error) {
 	// If a logger is present, lets log everything.
 	if y.Logger != nil {
 		y.Logger.Printf(
@@ -121,6 +109,18 @@ func (y *Yarf) log(err error, c *Context) {
 			c.Request.Method,
 			c.Request.URL.String(),
 		)
+	}
+
+	// Follow extensions pipe
+	if y.Follow != nil {
+		// Log follow
+		y.Logger.Print("FOLLOW => ")
+
+		// Follow
+		y.Follow.ServeHTTP(c.Response, c.Request)
+
+		// End here
+		return
 	}
 
 	// Return if no error or silent mode
