@@ -37,7 +37,7 @@ type Yarf struct {
 	// Follow defines a standard http.Handler implementation to follow if no route matches.
 	Follow http.Handler
 
-	// NotFound defines a function interface to execute when a NotFound error is thrown.
+	// NotFound defines a function interface to execute when a NotFound (404) error is thrown.
 	NotFound func(c *Context)
 }
 
