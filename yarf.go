@@ -6,7 +6,7 @@ import (
 )
 
 // Framework version string
-const Version = "0.6"
+const Version = "0.7"
 
 // Yarf is the main entry point for the framework and it centralizes most of the functionality.
 // All configuration actions are handled by this object.
@@ -36,6 +36,9 @@ type Yarf struct {
 
 	// Follow defines a standard http.Handler implementation to follow if no route matches.
 	Follow http.Handler
+
+	// NotFound defines a function interface to execute when a NotFound error is thrown.
+	NotFound func(c *Context)
 }
 
 // New creates a new yarf and returns a pointer to it.
@@ -55,7 +58,7 @@ func New() *Yarf {
 // ServeHTTP Implements http.Handler interface into yarf.
 // Initializes a Context object and handles middleware and route actions.
 // If an error is returned by any of the actions, the flow is stopped and a response is sent.
-// If no route matches, tries to forward the request to the Yarf.Follow (http.Handler type) property if set. 
+// If no route matches, tries to forward the request to the Yarf.Follow (http.Handler type) property if set.
 // Otherwise it returns a 404 response.
 func (y *Yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	if y.PanicHandler != nil {
@@ -89,21 +92,26 @@ func (y *Yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		y.log(err, c)
 		return
 	}
-    
-    // Log follow
-    y.log(nil, c)
-    
+
 	// Follow extensions pipe
 	if y.Follow != nil {
+		// Log follow
+		y.log(nil, c)
+
+		// Follow
 		y.Follow.ServeHTTP(c.Response, c.Request)
-        
+
+		// End here
 		return
 	}
 
 	// Return 404
-	c.Response.WriteHeader(404)
+	y.log(ErrorNotFound(), c)
 }
 
+// Log handles the end of the execution.
+// It checks for errors and custom actions to execute.
+// It also handles the custom 404 error handler.
 func (y *Yarf) log(err error, c *Context) {
 	// If a logger is present, lets log everything.
 	if y.Logger != nil {
@@ -135,8 +143,9 @@ func (y *Yarf) log(err error, c *Context) {
 	// Write error data to response.
 	c.Response.WriteHeader(yerr.Code())
 
+	// Render errors if debug enabled
 	if y.Debug {
-		c.Response.Write([]byte(yerr.Body()))
+		c.Render(yerr.Body())
 	}
 
 	// Log errors
@@ -146,6 +155,11 @@ func (y *Yarf) log(err error, c *Context) {
 			yerr.Code(),
 			yerr.Body(),
 		)
+	}
+
+	// Custom 404
+	if yerr.Code() == 404 && y.NotFound != nil {
+		y.NotFound(c)
 	}
 }
 
