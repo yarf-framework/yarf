@@ -114,7 +114,7 @@ func (y *Yarf) finish(c *Context, err error) {
 	// Follow extensions pipe
 	if y.Follow != nil {
 		// Log follow
-		y.Logger.Print("FOLLOW => ")
+		y.Logger.Print("FOLLOW")
 
 		// Follow
 		y.Follow.ServeHTTP(c.Response, c.Request)
