@@ -93,6 +93,19 @@ func (y *Yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// Follow only when route doesn't match.
+	// Returned 404 errors won't follow.
+	if y.Follow != nil {
+		// Log follow
+		y.finish(c, nil)
+
+		// Follow
+		y.Follow.ServeHTTP(c.Response, c.Request)
+
+		// End here
+		return
+	}
+
 	// Return 404
 	y.finish(c, ErrorNotFound())
 }
@@ -129,6 +142,12 @@ func (y *Yarf) finish(c *Context, err error) {
 		}
 	}
 
+	// Custom 404
+	if yerr.Code() == 404 && y.NotFound != nil {
+		y.NotFound(c)
+		return
+	}
+
 	// Write error data to response.
 	c.Response.WriteHeader(yerr.Code())
 
@@ -146,26 +165,6 @@ func (y *Yarf) finish(c *Context, err error) {
 			yerr.Code(),
 			yerr.Body(),
 		)
-	}
-
-	// Custom 404 and Follow actions
-	if yerr.Code() == 404 {
-		// Follow action
-		if y.Follow != nil {
-			// Log follow
-			y.Logger.Printf("%s | %s | FOLLOW", c.ID(false), c.GetClientIP())
-
-			// Follow
-			y.Follow.ServeHTTP(c.Response, c.Request)
-
-			// End here
-			return
-		}
-
-		// If no follow action, look for custom 404
-		if y.NotFound != nil {
-			y.NotFound(c)
-		}
 	}
 }
 
