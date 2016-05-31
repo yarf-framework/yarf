@@ -3,6 +3,7 @@ package yarf
 import (
 	"encoding/json"
 	"encoding/xml"
+	"github.com/leonelquinteros/gorand"
 	"net/http"
 	"net/url"
 	"strings"
@@ -42,15 +43,41 @@ type Context struct {
 
 	// Group route storage for dispatch
 	groupDispatch []Router
+
+	// Context ID
+	id string
 }
 
-// NewContext instantiates a new *Context object with default values and returns it.
+// NewContext creates a new *Context object with default values and returns it.
 func NewContext(r *http.Request, rw http.ResponseWriter) *Context {
 	return &Context{
 		Request:  r,
 		Response: rw,
 		Params:   url.Values{},
 	}
+}
+
+// ID returns the randomly auto-generated context ID for the current object.
+// If the full param is set to true, the function returns the entire ID value.
+// Otherwise, it returns a resumed version for readability purposes only.
+func (c *Context) ID(full bool) string {
+	// Generate ID if not present.
+	if c.id == "" {
+		id, err := gorand.ID()
+		if err != nil {
+			id = err.Error()
+		}
+
+		c.id = id
+	}
+
+	// Full version
+	if full {
+		return c.id
+	}
+
+	// Resumed version
+	return c.id[:8] + "..." + c.id[len(c.id)-8:]
 }
 
 // Status sets the HTTP status code to be returned on the response.

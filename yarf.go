@@ -104,23 +104,12 @@ func (y *Yarf) finish(c *Context, err error) {
 	// If a logger is present, lets log everything.
 	if y.Logger != nil {
 		y.Logger.Printf(
-			"| %s | %s | %s ",
+			"%s | %s | %s | %s ",
+			c.ID(false),
 			c.GetClientIP(),
 			c.Request.Method,
 			c.Request.URL.String(),
 		)
-	}
-
-	// Follow extensions pipe
-	if y.Follow != nil {
-		// Log follow
-		y.Logger.Print("FOLLOW")
-
-		// Follow
-		y.Follow.ServeHTTP(c.Response, c.Request)
-
-		// End here
-		return
 	}
 
 	// Return if no error or silent mode
@@ -151,15 +140,32 @@ func (y *Yarf) finish(c *Context, err error) {
 	// Log errors
 	if y.Logger != nil {
 		y.Logger.Printf(
-			"ERROR: %d | %s ",
+			"%s | %s | ERROR: %d | %s ",
+			c.ID(false),
+			c.GetClientIP(),
 			yerr.Code(),
 			yerr.Body(),
 		)
 	}
 
-	// Custom 404
-	if yerr.Code() == 404 && y.NotFound != nil {
-		y.NotFound(c)
+	// Custom 404 and Follow actions
+	if yerr.Code() == 404 {
+		// Follow action
+		if y.Follow != nil {
+			// Log follow
+			y.Logger.Printf("%s | %s | FOLLOW", c.ID(false), c.GetClientIP())
+
+			// Follow
+			y.Follow.ServeHTTP(c.Response, c.Request)
+
+			// End here
+			return
+		}
+
+		// If no follow action, look for custom 404
+		if y.NotFound != nil {
+			y.NotFound(c)
+		}
 	}
 }
 
