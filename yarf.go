@@ -159,11 +159,12 @@ func (y *Yarf) finish(c *Context, err error) {
 	// Log errors
 	if y.Logger != nil {
 		y.Logger.Printf(
-			"%s | %s | ERROR: %d | %s ",
+			"%s | %s | ERROR: %d | %s | %s",
 			c.ID(false),
 			c.GetClientIP(),
 			yerr.Code(),
 			yerr.Body(),
+			yerr.Msg(),
 		)
 	}
 }
