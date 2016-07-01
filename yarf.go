@@ -117,8 +117,7 @@ func (y *Yarf) finish(c *Context, err error) {
 	// If a logger is present, lets log everything.
 	if y.Logger != nil {
 		y.Logger.Printf(
-			"%s | %s | %s | %s ",
-			c.ID(false),
+			" %s | %s | %s ",
 			c.GetClientIP(),
 			c.Request.Method,
 			c.Request.URL.String(),
@@ -159,8 +158,7 @@ func (y *Yarf) finish(c *Context, err error) {
 	// Log errors
 	if y.Logger != nil {
 		y.Logger.Printf(
-			"%s | %s | ERROR: %d | %s | %s",
-			c.ID(false),
+			"%s | ERROR: %d | %s | %s",
 			c.GetClientIP(),
 			yerr.Code(),
 			yerr.Body(),
