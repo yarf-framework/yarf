@@ -51,8 +51,11 @@ func (r *route) Match(url string, c *Context) bool {
 	requestParts := prepareURL(url)
 
 	// YARF router only accepts exact route matches, so check for part count.
-	if len(r.routeParts) != len(requestParts) {
-		return false
+	// Unless it's a catch-all route
+	if len(r.routeParts) == 0 || (len(r.routeParts) > 0 && r.routeParts[len(r.routeParts)-1] != "*") {
+		if len(r.routeParts) != len(requestParts) {
+			return false
+		}
 	}
 
 	// check that requestParts matches routeParts
@@ -257,12 +260,23 @@ func removeEmpty(parts []string) []string {
 // matches returns true if requestParts matches routeParts up through len(routeParts)
 // ignoring params in routeParts
 func matches(routeParts, requestParts []string) bool {
-	if len(requestParts) < len(routeParts) {
+	routeCount := len(routeParts)
+
+	// Check for catch-all wildcard
+	if len(routeParts) > 0 && routeParts[len(routeParts)-1] == "*" {
+		routeCount--
+	}
+
+	if len(requestParts) < routeCount {
 		return false
 	}
 
-	// Check for part matching, ignoring params
+	// Check for part matching, ignoring params and * wildcards
 	for i, p := range routeParts {
+		// Skip wildcard
+		if p == "*" {
+			continue
+		}
 		if p != requestParts[i] && p[0] != ':' {
 			return false
 		}

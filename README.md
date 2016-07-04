@@ -153,6 +153,72 @@ func (h *Hello) Get(c *yarf.Context) error {
 ```
 
 
+### Route wildcards
+
+When some extra freedom is needed on your routes, you can use a `*` as part of your routes to match anything where the wildcard is present. 
+
+The route: 
+
+```
+/something/*/here
+```
+
+Will match the routes
+
+```
+/something/is/here
+/something/happen/here
+/something/isnt/here
+/something/was/here
+```
+
+And so on... 
+
+You can also combine this with parameters inside the routes for extra complexity.
+
+
+### Catch-All wildcard
+
+When using the `*` at the end of any route, the router will match everything from the wildcard and forward. 
+
+The route: 
+
+```
+/match/from/here/*
+```
+
+Will match: 
+
+```
+/match/from/here
+/match/from/here/please
+/match/from/here/and/forward
+/match/from/here/and/forward/for/ever/and/ever
+```
+
+And so on...
+
+
+#### Note about the wildcard
+
+The `*` can only be used by itself and it doesn't works for single character matching like in regex. 
+
+So the route:
+ 
+```
+/match/some*
+```
+
+Will **NOT** match:
+
+```
+/match/some
+/match/something
+/match/someone
+/match/some/please
+```
+
+
 ### Context
 
 The Context object is passed as a parameter to all Resource methods and contains all the information related to the ongoing request. 

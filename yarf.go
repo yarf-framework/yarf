@@ -6,7 +6,7 @@ import (
 )
 
 // Framework version string
-const Version = "0.7"
+const Version = "0.7.1"
 
 // Yarf is the main entry point for the framework and it centralizes most of the functionality.
 // All configuration actions are handled by this object.
@@ -147,14 +147,6 @@ func (y *Yarf) finish(c *Context, err error) {
 		return
 	}
 
-	// Write error data to response.
-	c.Response.WriteHeader(yerr.Code())
-
-	// Render errors if debug enabled
-	if y.Debug {
-		c.Render(yerr.Body())
-	}
-
 	// Log errors
 	if y.Logger != nil {
 		y.Logger.Printf(
@@ -165,6 +157,14 @@ func (y *Yarf) finish(c *Context, err error) {
 			yerr.Msg(),
 		)
 	}
+
+	// Render errors if debug enabled
+	if y.Debug {
+		c.Render(yerr.Body())
+	}
+
+	// Write error data to response.
+	c.Response.WriteHeader(yerr.Code())
 }
 
 // Start initiates a new http yarf server and start listening.

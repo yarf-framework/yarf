@@ -33,6 +33,28 @@ func TestRouterRootMatch(t *testing.T) {
 	}
 }
 
+func TestRouterRootCatchAll(t *testing.T) {
+	// Create empty handler
+	h := new(Handler)
+
+	// Create empty context
+	c := new(Context)
+	c.Params = url.Values{}
+
+	// Create route
+	r := Route("/*", h)
+
+	// Matching routes
+	rs := []string{"/", "", "/something", "/*", "/something/else/more"}
+
+	// Check
+	for _, s := range rs {
+		if !r.Match(s, c) {
+			t.Errorf("'%s' should match against '*'", s)
+		}
+	}
+}
+
 func TestRouterRootUnmatch(t *testing.T) {
 	// Create empty handler
 	h := new(Handler)
@@ -73,6 +95,28 @@ func TestRouter1LevelMatch(t *testing.T) {
 	for _, s := range rs {
 		if !r.Match(s, c) {
 			t.Errorf("'%s' should match against '/level'", s)
+		}
+	}
+}
+
+func TestRouter1LevelCatchAll(t *testing.T) {
+	// Create empty handler
+	h := new(Handler)
+
+	// Create empty context
+	c := new(Context)
+	c.Params = url.Values{}
+
+	// Create route
+	r := Route("/level/*", h)
+
+	// Matching routes
+	rs := []string{"/level/something", "level/something", "/level/*", "/level/something/else/and/more/because/this/matches/all"}
+
+	// Check
+	for _, s := range rs {
+		if !r.Match(s, c) {
+			t.Errorf("'%s' should match against '/level/*'", s)
 		}
 	}
 }
@@ -121,6 +165,50 @@ func TestRouterMultiLevelMatch(t *testing.T) {
 	}
 }
 
+func TestRouterMultiLevelWildcard(t *testing.T) {
+	// Create empty handler
+	h := new(Handler)
+
+	// Create empty context
+	c := new(Context)
+	c.Params = url.Values{}
+
+	// Create route
+	r := Route("/a/b/*/d", h)
+
+	// Matching routes
+	rs := []string{"/a/b/c/d", "a/b/c/d", "/a/b/*/d", "a/b/something/d"}
+
+	// Check
+	for _, s := range rs {
+		if !r.Match(s, c) {
+			t.Errorf("'%s' should match against '/a/b/*/d", s)
+		}
+	}
+}
+
+func TestRouterMultiLevelCatchAll(t *testing.T) {
+	// Create empty handler
+	h := new(Handler)
+
+	// Create empty context
+	c := new(Context)
+	c.Params = url.Values{}
+
+	// Create route
+	r := Route("/a/b/*", h)
+
+	// Matching routes
+	rs := []string{"/a/b/c", "a/b/c", "/a/b/c/d/e", "a/b/c/d"}
+
+	// Check
+	for _, s := range rs {
+		if !r.Match(s, c) {
+			t.Errorf("'%s' should match against '/a/b/*", s)
+		}
+	}
+}
+
 func TestRouterMultiLevelUnmatch(t *testing.T) {
 	// Create empty handler
 	h := new(Handler)
@@ -165,6 +253,28 @@ func TestRouter1LevelParamMatch(t *testing.T) {
 	}
 }
 
+func TestRouter1LevelParamCatchAll(t *testing.T) {
+	// Create empty handler
+	h := new(Handler)
+
+	// Create empty context
+	c := new(Context)
+	c.Params = url.Values{}
+
+	// Create route
+	r := Route("/:param/*", h)
+
+	// Matching routes
+	rs := []string{"/a", "a", "/cafewafewa", "/:paramStyle", "/trailer/", "/something/more/to/catch"}
+
+	// Check
+	for _, s := range rs {
+		if !r.Match(s, c) {
+			t.Errorf("'%s' should match against '/:param/*'", s)
+		}
+	}
+}
+
 func TestRouter1LevelParamUnmatch(t *testing.T) {
 	// Create empty handler
 	h := new(Handler)
@@ -205,6 +315,50 @@ func TestRouterMultiLevelParamMatch(t *testing.T) {
 	for _, s := range rs {
 		if !r.Match(s, c) {
 			t.Errorf("'%s' should match against '/a/b/:param'", s)
+		}
+	}
+}
+
+func TestRouterMultiLevelParamWildcard(t *testing.T) {
+	// Create empty handler
+	h := new(Handler)
+
+	// Create empty context
+	c := new(Context)
+	c.Params = url.Values{}
+
+	// Create route
+	r := Route("/a/*/:param", h)
+
+	// Matching routes
+	rs := []string{"/a/b/c", "a/b/c", "/a/b/c/", "a/b/c/", "/a/b/:c", "/a/b/:param"}
+
+	// Check
+	for _, s := range rs {
+		if !r.Match(s, c) {
+			t.Errorf("'%s' should match against '/a/*/:param'", s)
+		}
+	}
+}
+
+func TestRouterMultiLevelParamCatchAll(t *testing.T) {
+	// Create empty handler
+	h := new(Handler)
+
+	// Create empty context
+	c := new(Context)
+	c.Params = url.Values{}
+
+	// Create route
+	r := Route("/a/b/:param/*", h)
+
+	// Matching routes
+	rs := []string{"/a/b/c", "a/b/c", "/a/b/c/", "a/b/c/", "/a/b/:c", "/a/b/:param", "/a/b/c/d/e/f/g", "/a/b/c/d/:param/*"}
+
+	// Check
+	for _, s := range rs {
+		if !r.Match(s, c) {
+			t.Errorf("'%s' should match against '/a/b/:param/*'", s)
 		}
 	}
 }
@@ -319,6 +473,29 @@ func TestRouterGroupMatch(t *testing.T) {
 
 	// Matching routes
 	rs := []string{"/v1/test/test", "/v1/test/:param/"}
+
+	// Check
+	for _, s := range rs {
+		if !g.Match(s, c) {
+			t.Errorf("'%s' should match", s)
+		}
+	}
+}
+
+func TestRouterGroupCatchAll(t *testing.T) {
+	// Create empty handler
+	h := new(Handler)
+
+	// Create empty context
+	c := new(Context)
+	c.Params = url.Values{}
+
+	// Create group
+	g := RouteGroup("/v1")
+	g.Add("/test/*", h)
+
+	// Matching routes
+	rs := []string{"/v1/test/test", "/v1/test/:param/", "/v1/test/this/is/a/wild/card"}
 
 	// Check
 	for _, s := range rs {
