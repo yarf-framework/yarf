@@ -1,7 +1,5 @@
 package yarf
 
-import ()
-
 // MiddlewareHandler interface provides the methods for request filters
 // that needs to run before, or after, every request Resource is executed.
 type MiddlewareHandler interface {

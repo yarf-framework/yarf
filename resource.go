@@ -1,7 +1,5 @@
 package yarf
 
-import ()
-
 // The ResourceHandler interface defines how Resources through the application have to be defined.
 // Ideally, the developer will composite the Resource struct into their own resources,
 // but it's possible to implement each one by their own.
