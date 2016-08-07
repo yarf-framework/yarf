@@ -1,14 +1,13 @@
 package yarf
 
 import (
-	"net/url"
 	"sync"
 )
 
 // routeCache stores previously matched and parsed routes
 type routeCache struct {
 	route  []Router
-	params url.Values
+	params Params
 }
 
 // Cache is the service handler for route caching

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"net/http"
-	"net/url"
 	"strings"
 )
 
@@ -24,6 +23,32 @@ type ContextData interface {
 	Del(key string) error
 }
 
+// Params wraps a map[string]string and adds Get/Set/Del methods to work with it.
+// Inspired on url.Values but simpler as it doesn't handles a map[string][]string
+type Params map[string]string
+
+// Get gets the first value associated with the given key.
+// If there are no values associated with the key, Get returns
+// the empty string.
+func (p Params) Get(key string) string {
+	if p == nil {
+		return ""
+	}
+
+	param, _ := p[key]
+	return param
+}
+
+// Set sets the key to value. It replaces any existing values.
+func (p Params) Set(key, value string) {
+	p[key] = value
+}
+
+// Del deletes the values associated with key.
+func (p Params) Del(key string) {
+	delete(p, key)
+}
+
 // Context is the data/status storage of every YARF request.
 // Every request will instantiate a new Context object and fill in with all the request data.
 // Each request Context will be shared along the entire request life to ensure accesibility of its data at all levels.
@@ -35,7 +60,7 @@ type Context struct {
 	Response http.ResponseWriter
 
 	// Parameters received through URL route
-	Params url.Values
+	Params Params
 
 	// Free storage to be used freely by apps to their convenience.
 	Data ContextData
@@ -49,7 +74,7 @@ func NewContext(r *http.Request, rw http.ResponseWriter) *Context {
 	return &Context{
 		Request:  r,
 		Response: rw,
-		Params:   url.Values{},
+		Params:   Params{},
 	}
 }
 

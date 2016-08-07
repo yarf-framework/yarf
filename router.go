@@ -204,10 +204,13 @@ func (g *routeGroup) Dispatch(c *Context) (err error) {
 func (g *routeGroup) endDispatch(c *Context) (err error) {
 	// End dispatch middleware
 	for _, m := range g.middleware {
-		err = m.End(c)
+		e := m.End(c)
+		if e != nil {
+			// If there are any error, only return the last to be sure we go through all middlewares.
+			err = e
+		}
 	}
 
-	// If there are any error, only return the last to be sure we go through all middlewares.
 	return
 }
 
@@ -229,32 +232,21 @@ func (g *routeGroup) Insert(m MiddlewareHandler) {
 
 // prepareUrl trims leading and trailing slahses, splits url parts, and removes empty parts
 func prepareURL(url string) []string {
-	return removeEmpty(strings.Split(trimSlash(url), "/"))
-}
-
-// trimSlash cleans all leading and trailing "/" from request url
-func trimSlash(url string) string {
-	for len(url) > 0 && url[0] == '/' {
-		url = url[1:]
-	}
-	for len(url) > 0 && url[len(url)-1] == '/' {
-		url = url[:len(url)-1]
-	}
-	return url
+	return removeEmpty(strings.Split(url, "/"))
 }
 
 // removeEmpty removes blank strings from parts in one pass, shifting elements
 // of the array down, and returns the altered array.
 func removeEmpty(parts []string) []string {
-	i := 0
-	for j, p := range parts {
-		if p == "" {
-			continue
+	x := parts[:0]
+
+	for _, p := range parts {
+		if p != "" {
+			x = append(x, p)
 		}
-		parts[i] = parts[j]
-		i++
 	}
-	return parts[:i]
+
+	return x
 }
 
 // matches returns true if requestParts matches routeParts up through len(routeParts)
