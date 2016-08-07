@@ -122,3 +122,30 @@ func TestRenderXMLIndent(t *testing.T) {
 		t.Errorf("'%s' sent to RenderXMLIndent() method, '%s' found on Response object", "TEST", c.Response.(*httptest.ResponseRecorder).Body.String())
 	}
 }
+
+func TestParams(t *testing.T) {
+	p := Params{}
+	key := "CHECK"
+	value := "THIS"
+	check := ""
+
+	// Get empty
+	check = p.Get(key)
+	if check != "" {
+		t.Errorf("Expected to get an empty string for unassigned %s key. But got %s", key, check)
+	}
+
+	// Set key/value
+	p.Set(key, value)
+	check = p.Get(key)
+	if check != value {
+		t.Errorf("Expected to get %s for %s key. But got %s", value, key, check)
+	}
+
+	// Delete key
+	p.Del(key)
+	check = p.Get(key)
+	if check != "" {
+		t.Errorf("Expected to get an empty string for deleted %s key. But got %s", key, check)
+	}
+}
