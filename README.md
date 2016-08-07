@@ -14,6 +14,10 @@ Designed after Go's composition features, takes a new approach to write simple a
 https://godoc.org/github.com/yarf-framework/yarf
 
 
+#### Test coverage
+
+https://gocover.io/github.com/yarf-framework/yarf
+
 
 ## Getting started
 
