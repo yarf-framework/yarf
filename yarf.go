@@ -5,8 +5,8 @@ import (
 	"net/http"
 )
 
-// Framework version string
-const Version = "0.7.1"
+// Version string
+const Version = "0.8.0"
 
 // Yarf is the main entry point for the framework and it centralizes most of the functionality.
 // All configuration actions are handled by this object.
@@ -86,7 +86,7 @@ func (y *Yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	// Route match
 	if y.Match(req.URL.Path, c) {
 		if y.UseCache {
-			y.cache.Set(req.URL.Path, routeCache{c.groupDispatch, c.Params})
+			y.cache.Set(req.URL.Path, RouteCache{c.groupDispatch, c.Params})
 		}
 		err := y.Dispatch(c)
 		y.finish(c, err)
@@ -134,7 +134,7 @@ func (y *Yarf) finish(c *Context, err error) {
 	if !ok {
 		// Create default 500 error
 		yerr = &CustomError{
-			HttpCode:  500,
+			HTTPCode:  500,
 			ErrorCode: 0,
 			ErrorMsg:  err.Error(),
 			ErrorBody: err.Error(),

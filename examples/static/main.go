@@ -7,14 +7,14 @@ import (
 	"net/http"
 )
 
-// Define a simple resource
+// Static defines a simple resource
 type Static struct {
 	yarf.Resource // Extend the yarf.Resource by composition
 
 	path string // Directory to serve static files from.
 }
 
-// Implement the static files handler
+// Get implements the static files handler
 func (s *Static) Get(c *yarf.Context) error {
 	http.FileServer(http.Dir(s.path)).ServeHTTP(c.Response, c.Request)
 

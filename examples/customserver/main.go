@@ -6,12 +6,12 @@ import (
 	"time"
 )
 
-// Define a simple resource
+// Hello defines a simple resource
 type Hello struct {
 	yarf.Resource // Extend the yarf.Resource by composition
 }
 
-// Implement the GET handler
+// Get implements the GET handler
 func (h *Hello) Get(c *yarf.Context) error {
 	c.Render("Hello world!")
 

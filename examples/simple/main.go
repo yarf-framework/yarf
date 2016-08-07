@@ -4,12 +4,12 @@ import (
 	"github.com/yarf-framework/yarf"
 )
 
-// Define a simple resource
+// Hello defines a simple resource by compositing yarf.Resource
 type Hello struct {
-	yarf.Resource // Extend the yarf.Resource by composition
+	yarf.Resource
 }
 
-// Implement the GET handler
+// Get implements the GET handler
 func (h *Hello) Get(c *yarf.Context) error {
 	c.Render("Hello world!")
 

@@ -420,8 +420,8 @@ func TestRouteGroupAddGroup(t *testing.T) {
 	if len(y.routes) != 1 {
 		t.Fatalf("Added 1 route group, found %d in the list.", len(y.routes))
 	}
-	if y.routes[0].(*routeGroup).prefix != "/group" {
-		t.Fatalf("Added a /group route prefix. Found %s", y.routes[0].(*routeGroup).prefix)
+	if y.routes[0].(*GroupRoute).prefix != "/group" {
+		t.Fatalf("Added a /group route prefix. Found %s", y.routes[0].(*GroupRoute).prefix)
 	}
 }
 
@@ -615,7 +615,7 @@ func BenchmarkRouteMatch_long(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		r.Match(routeString, c)
 		r.Match("/short/request/url", c)
-		r.Match("/very/long/route/with/ten/separate/parts/that/doesnt/match", c)
+		r.Match("/very/long/route/with/ten/separate/parts/that/do/not/match", c)
 	}
 }
 

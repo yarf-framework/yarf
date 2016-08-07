@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// Router interface provides the methods used to handle route and routeGroup objects.
+// Router interface provides the methods used to handle route and GroupRoute objects.
 type Router interface {
 	Match(string, *Context) bool
 	Dispatch(*Context) error
@@ -15,7 +15,7 @@ type Router interface {
 type GroupRouter interface {
 	Router
 	Add(string, ResourceHandler)
-	AddGroup(*routeGroup)
+	AddGroup(*GroupRoute)
 	Insert(MiddlewareHandler)
 }
 
@@ -105,8 +105,8 @@ func (r *route) Dispatch(c *Context) error {
 	return ErrorMethodNotImplemented()
 }
 
-// routeGroup stores routes grouped under a single url prefix.
-type routeGroup struct {
+// GroupRoute stores routes grouped under a single url prefix.
+type GroupRoute struct {
 	prefix string // The url prefix path for all routes in the group
 
 	routeParts []string // parsed Route split into parts
@@ -116,13 +116,13 @@ type routeGroup struct {
 	routes []Router // Group routes
 }
 
-// RouteGroup creates a new routeGroup object and initializes it with the provided url prefix.
+// RouteGroup creates a new GroupRoute object and initializes it with the provided url prefix.
 // The object implements Router interface to being able to handle groups as routes.
 // Groups can be nested into each other,
-// so it's possible to add a routeGroup as a route inside another routeGroup.
+// so it's possible to add a GroupRoute as a route inside another GroupRoute.
 // Includes methods to work with middleware.
-func RouteGroup(url string) *routeGroup {
-	return &routeGroup{
+func RouteGroup(url string) *GroupRoute {
+	return &GroupRoute{
 		prefix:     url,
 		routeParts: prepareURL(url),
 	}
@@ -132,7 +132,7 @@ func RouteGroup(url string) *routeGroup {
 // After a match is found, the route matching is stored into Context.groupDispatch
 // to being able to dispatch it directly after a match without looping again.
 // Outside the box, works exactly the same as route.Match()
-func (g *routeGroup) Match(url string, c *Context) bool {
+func (g *GroupRoute) Match(url string, c *Context) bool {
 	urlParts := prepareURL(url)
 
 	// check if urlParts matches routeParts
@@ -158,7 +158,7 @@ func (g *routeGroup) Match(url string, c *Context) bool {
 
 // Dispatch loops through all routes inside the group and dispatch the one that matches the request.
 // Outside the box, works exactly the same as route.Dispatch().
-func (g *routeGroup) Dispatch(c *Context) (err error) {
+func (g *GroupRoute) Dispatch(c *Context) (err error) {
 	if len(c.groupDispatch) == 0 {
 		g.endDispatch(c)
 		return errors.New("No matching route found")
@@ -201,7 +201,7 @@ func (g *routeGroup) Dispatch(c *Context) (err error) {
 	return
 }
 
-func (g *routeGroup) endDispatch(c *Context) (err error) {
+func (g *GroupRoute) endDispatch(c *Context) (err error) {
 	// End dispatch middleware
 	for _, m := range g.middleware {
 		e := m.End(c)
@@ -215,18 +215,18 @@ func (g *routeGroup) endDispatch(c *Context) (err error) {
 }
 
 // Add inserts a new resource with it's associated route into the group object.
-func (g *routeGroup) Add(url string, h ResourceHandler) {
+func (g *GroupRoute) Add(url string, h ResourceHandler) {
 	g.routes = append(g.routes, Route(url, h))
 }
 
-// AddGroup inserts a route group into the routes list of the group object.
+// AddGroup inserts a GroupRoute into the routes list of the group object.
 // This makes possible to nest groups.
-func (g *routeGroup) AddGroup(r *routeGroup) {
+func (g *GroupRoute) AddGroup(r *GroupRoute) {
 	g.routes = append(g.routes, r)
 }
 
 // Insert adds a MiddlewareHandler into the middleware list of the group object.
-func (g *routeGroup) Insert(m MiddlewareHandler) {
+func (g *GroupRoute) Insert(m MiddlewareHandler) {
 	g.middleware = append(g.middleware, m)
 }
 

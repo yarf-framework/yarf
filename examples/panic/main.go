@@ -5,21 +5,22 @@ import (
 	"github.com/yarf-framework/yarf"
 )
 
-// Define a simple resource
+// Panic defines a simple resource
 type Panic struct {
 	yarf.Resource // Extend the yarf.Resource by composition
 }
 
-// Implement a GET handler that panics
+// Get implements a GET handler that panics
 func (p *Panic) Get(c *yarf.Context) error {
 	c.Render("I'm panicking!")
 
 	panic("Totally panicking!")
 
-    // The next line is unreachable (govet)
+	// The next line is unreachable (govet)
 	//return nil
 }
 
+// PanicHandler is used to catch panics and display the error message
 func PanicHandler() {
 	if err := recover(); err != nil {
 		fmt.Printf("Handling panic: %v \n", err)
