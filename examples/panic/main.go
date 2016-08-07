@@ -16,7 +16,8 @@ func (p *Panic) Get(c *yarf.Context) error {
 
 	panic("Totally panicking!")
 
-	return nil
+    // The next line is unreachable (govet)
+	//return nil
 }
 
 func PanicHandler() {
