@@ -34,4 +34,7 @@ func TestMiddlewareDefaultResponse(t *testing.T) {
 	if m.PostDispatch(c) != nil {
 		t.Error("Default PostDispatch() implementation should return nil")
 	}
+	if m.End(c) != nil {
+		t.Error("Default End() implementation should return nil")
+	}
 }

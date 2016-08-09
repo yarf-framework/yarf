@@ -31,10 +31,6 @@ type Params map[string]string
 // If there are no values associated with the key, Get returns
 // the empty string.
 func (p Params) Get(key string) string {
-	if p == nil {
-		return ""
-	}
-
 	param, _ := p[key]
 	return param
 }
