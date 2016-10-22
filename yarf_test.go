@@ -344,13 +344,14 @@ func TestLogger(t *testing.T) {
 	y.Add("/test", r)
 
 	// Request
-	req, _ := http.NewRequest("GET", "http://localhost:8080/test", nil)
+	req, _ := http.NewRequest("GET", "/test", nil)
 	req.RemoteAddr = "127.0.0.1"
+	req.Host = "localhost:8080"
 	res := httptest.NewRecorder()
 	y.ServeHTTP(res, req)
 
 	// Check log
-	if !strings.HasSuffix(strings.TrimSpace(buf.String()), "127.0.0.1 | GET | http://localhost:8080/test") {
+	if !strings.HasSuffix(strings.TrimSpace(buf.String()), "127.0.0.1 | GET | localhost:8080/test") {
 		t.Errorf("Wrong log expected: %s", buf.String())
 	}
 
