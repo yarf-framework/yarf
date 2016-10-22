@@ -120,7 +120,7 @@ func (y *Yarf) finish(c *Context, err error) {
 			"%s | %s | %s ",
 			c.GetClientIP(),
 			c.Request.Method,
-			c.Request.URL.String(),
+			c.Request.Host+c.Request.URL.String(),
 		)
 	}
 
