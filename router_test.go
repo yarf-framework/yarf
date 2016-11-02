@@ -16,7 +16,7 @@ func TestRouterRootMatch(t *testing.T) {
 
 	// Create empty context
 	c := new(Context)
-	////c.Params = Params{}
+	c.Params = Params{}
 
 	// Create route
 	r := Route("/", h)
@@ -38,7 +38,7 @@ func TestRouterRootCatchAll(t *testing.T) {
 
 	// Create empty context
 	c := new(Context)
-	//c.Params = Params{}
+	c.Params = Params{}
 
 	// Create route
 	r := Route("/*", h)
@@ -60,7 +60,7 @@ func TestRouterRootUnmatch(t *testing.T) {
 
 	// Create empty context
 	c := new(Context)
-	//c.Params = Params{}
+	c.Params = Params{}
 
 	// Create route
 	r := Route("/", h)
@@ -82,7 +82,7 @@ func TestRouter1LevelMatch(t *testing.T) {
 
 	// Create empty context
 	c := new(Context)
-	//c.Params = Params{}
+	c.Params = Params{}
 
 	// Create route
 	r := Route("/level", h)
@@ -104,7 +104,7 @@ func TestRouter1LevelCatchAll(t *testing.T) {
 
 	// Create empty context
 	c := new(Context)
-	//c.Params = Params{}
+	c.Params = Params{}
 
 	// Create route
 	r := Route("/level/*", h)
@@ -126,7 +126,7 @@ func TestRouter1LevelUnmatch(t *testing.T) {
 
 	// Create empty context
 	c := new(Context)
-	//c.Params = Params{}
+	c.Params = Params{}
 
 	// Create route
 	r := Route("/level", h)
@@ -148,7 +148,7 @@ func TestRouterMultiLevelMatch(t *testing.T) {
 
 	// Create empty context
 	c := new(Context)
-	//c.Params = Params{}
+	c.Params = Params{}
 
 	// Create route
 	r := Route("/a/b/c", h)
@@ -170,7 +170,7 @@ func TestRouterMultiLevelWildcard(t *testing.T) {
 
 	// Create empty context
 	c := new(Context)
-	//c.Params = Params{}
+	c.Params = Params{}
 
 	// Create route
 	r := Route("/a/b/*/d", h)
@@ -192,7 +192,7 @@ func TestRouterMultiLevelCatchAll(t *testing.T) {
 
 	// Create empty context
 	c := new(Context)
-	//c.Params = Params{}
+	c.Params = Params{}
 
 	// Create route
 	r := Route("/a/b/*", h)
@@ -214,7 +214,7 @@ func TestRouterMultiLevelUnmatch(t *testing.T) {
 
 	// Create empty context
 	c := new(Context)
-	//c.Params = Params{}
+	c.Params = Params{}
 
 	// Create route
 	r := Route("/a/b/c", h)
@@ -236,7 +236,7 @@ func TestRouter1LevelParamMatch(t *testing.T) {
 
 	// Create empty context
 	c := new(Context)
-	//c.Params = Params{}
+	c.Params = Params{}
 
 	// Create route
 	r := Route("/:param", h)
@@ -258,7 +258,7 @@ func TestRouter1LevelParamCatchAll(t *testing.T) {
 
 	// Create empty context
 	c := new(Context)
-	//c.Params = Params{}
+	c.Params = Params{}
 
 	// Create route
 	r := Route("/:param/*", h)
@@ -280,7 +280,7 @@ func TestRouter1LevelParamUnmatch(t *testing.T) {
 
 	// Create empty context
 	c := new(Context)
-	//c.Params = Params{}
+	c.Params = Params{}
 
 	// Create route
 	r := Route("/:param", h)
@@ -302,7 +302,7 @@ func TestRouterMultiLevelParamMatch(t *testing.T) {
 
 	// Create empty context
 	c := new(Context)
-	//c.Params = Params{}
+	c.Params = Params{}
 
 	// Create route
 	r := Route("/a/b/:param", h)
@@ -324,7 +324,7 @@ func TestRouterMultiLevelParamWildcard(t *testing.T) {
 
 	// Create empty context
 	c := new(Context)
-	//c.Params = Params{}
+	c.Params = Params{}
 
 	// Create route
 	r := Route("/a/*/:param", h)
@@ -346,7 +346,7 @@ func TestRouterMultiLevelParamCatchAll(t *testing.T) {
 
 	// Create empty context
 	c := new(Context)
-	//c.Params = Params{}
+	c.Params = Params{}
 
 	// Create route
 	r := Route("/a/b/:param/*", h)
@@ -368,7 +368,7 @@ func TestRouterMultiLevelParamUnmatch(t *testing.T) {
 
 	// Create empty context
 	c := new(Context)
-	//c.Params = Params{}
+	c.Params = Params{}
 
 	// Create route
 	r := Route("/a/b/:param", h)
@@ -446,7 +446,7 @@ func TestRouterGroupDispatch(t *testing.T) {
 	g1.AddGroup(g2)
 	g2.Add("test", &Handler{})
 
-	c := &Context{Request: &http.Request{}}
+	c := &Context{Params: Params{}, Request: &http.Request{}}
 
 	if !g1.Match("one/two/test", c) {
 		t.Errorf("Route did not match")
@@ -464,7 +464,7 @@ func TestRouterGroupMatch(t *testing.T) {
 
 	// Create empty context
 	c := new(Context)
-	//c.Params = Params{}
+	c.Params = Params{}
 
 	// Create group
 	g := RouteGroup("/v1")
@@ -487,7 +487,7 @@ func TestRouterGroupCatchAll(t *testing.T) {
 
 	// Create empty context
 	c := new(Context)
-	//c.Params = Params{}
+	c.Params = Params{}
 
 	// Create group
 	g := RouteGroup("/v1")
@@ -510,7 +510,7 @@ func TestRouterGroupNotMatch(t *testing.T) {
 
 	// Create empty context
 	c := new(Context)
-	//c.Params = Params{}
+	c.Params = Params{}
 
 	// Create group
 	g := RouteGroup("/v1")
@@ -538,11 +538,9 @@ func TestRouterGroupParams(t *testing.T) {
 		t.Errorf("shouldn't match")
 	}
 
-	/*
-		if len(c.Params) > 0 {
-			t.Errorf("RouteGroup should not write params if children did not match: %v", c.Params)
-		}
-	*/
+	if len(c.Params) > 0 {
+		t.Errorf("RouteGroup should not write params if children did not match: %v", c.Params)
+	}
 }
 
 func TestRouterNestedGroupMatch(t *testing.T) {
@@ -551,7 +549,7 @@ func TestRouterNestedGroupMatch(t *testing.T) {
 
 	// Create empty context
 	c := new(Context)
-	//c.Params = Params{}
+	c.Params = Params{}
 
 	// Create groups
 	l1 := RouteGroup("/level1")
@@ -561,7 +559,7 @@ func TestRouterNestedGroupMatch(t *testing.T) {
 	// Add one route
 	l3.Add("/test/:param", h)
 
-	// Neste into:
+	// Nested into:
 	// - /level1/level2/level3/test/:param
 	// - /level2/level3/test/:param
 	// - /level3/test/:param
@@ -601,7 +599,7 @@ func TestRouterNestedGroupMatch(t *testing.T) {
 
 func BenchmarkRouteMatch_short(b *testing.B) {
 	h := &Handler{}
-	c := &Context{}
+	c := &Context{Params: Params{}}
 	r := Route("/test", h)
 	for i := 0; i < b.N; i++ {
 		r.Match("/test", c)
@@ -611,7 +609,7 @@ func BenchmarkRouteMatch_short(b *testing.B) {
 
 func BenchmarkRouteMatch_long(b *testing.B) {
 	h := &Handler{}
-	c := &Context{}
+	c := &Context{Params: Params{}}
 	routeString := "/very/long/route/with/ten/separate/parts/eight/nine/ten"
 	r := Route(routeString, h)
 	for i := 0; i < b.N; i++ {
@@ -623,7 +621,7 @@ func BenchmarkRouteMatch_long(b *testing.B) {
 
 func BenchmarkRouteMatch_emptyParts(b *testing.B) {
 	h := &Handler{}
-	c := &Context{}
+	c := &Context{Params: Params{}}
 	r := Route("/route///with//lots////of///empty///parts/", h)
 	for i := 0; i < b.N; i++ {
 		r.Match("/route///with/lots/of////empty////parts/", c)
@@ -633,7 +631,7 @@ func BenchmarkRouteMatch_emptyParts(b *testing.B) {
 
 func BenchmarkRouteGroupMatch_short(b *testing.B) {
 	h := &Handler{}
-	c := &Context{}
+	c := &Context{Params: Params{}}
 	r := RouteGroup("/prefix")
 	r.Add("/suffix", h)
 	for i := 0; i < b.N; i++ {
@@ -644,7 +642,7 @@ func BenchmarkRouteGroupMatch_short(b *testing.B) {
 
 func BenchmarkRouteGroupMatch_nested(b *testing.B) {
 	h := &Handler{}
-	c := &Context{}
+	c := &Context{Params: Params{}}
 	// create a set of nested RouteGroups 20 levels deep
 	g := RouteGroup("/test")
 	g.Add("/router", h)

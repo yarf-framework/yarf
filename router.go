@@ -20,7 +20,7 @@ type GroupRouter interface {
 	Insert(MiddlewareHandler)
 }
 
-// route struct stores the expected route path and the ResourceHandler that handles that route.
+// route stores the expected route path and the ResourceHandler that handles that route.
 type route struct {
 	prefix string // Group route prefix, if any.
 
@@ -73,8 +73,9 @@ func (r *route) Match(url string, c *Context) bool {
 
 	// It matches. Store route into Context.
 	c.Route = r
-
-	//storeParams(c, r.routeParts, requestParts)
+    
+    // Store params
+	c.StoreParams(r.routeParts, requestParts)
 
 	return true
 }
@@ -131,7 +132,6 @@ type GroupRoute struct {
 // The object implements Router interface to being able to handle groups as routes.
 // Groups can be nested into each other,
 // so it's possible to add a GroupRoute as a route inside another GroupRoute.
-// Includes methods to work with middleware.
 func RouteGroup(url string) *GroupRoute {
 	return &GroupRoute{
 		prefix:     url,
@@ -162,15 +162,8 @@ func (g *GroupRoute) Match(url string, c *Context) bool {
 	// Now look for a match inside the routes collection
 	for _, r := range g.routes {
 		if r.Match(rURL, c) {
-			/*
-				// store the matching Router and params after a match is found
-				c.groupDispatch = append(c.groupDispatch, r)
-				storeParams(c, g.routeParts, urlParts)
-			*/
-
-			// Store matching router into context
-			//c.Route = r it was stored on route match
-
+		    // Store group prefix params
+		    c.StoreParams(g.routeParts, urlParts)
 			return true
 		}
 	}
@@ -178,9 +171,6 @@ func (g *GroupRoute) Match(url string, c *Context) bool {
 	return false
 }
 
-/*
-// Dispatch loops through all routes inside the group and dispatches the one that matches the request.
-*/
 // Dispatch takes the matched route stored in context and dispatches it.
 // Outside the box, works exactly the same as route.Dispatch().
 func (g *GroupRoute) Dispatch(c *Context) (err error) {
@@ -188,12 +178,6 @@ func (g *GroupRoute) Dispatch(c *Context) (err error) {
 		g.endDispatch(c)
 		return errors.New("No matching route found")
 	}
-	/*
-		if len(c.groupDispatch) == 0 {
-			g.endDispatch(c)
-			return errors.New("No matching route found")
-		}
-	*/
 
 	// Pre-dispatch middleware
 	for _, m := range g.middleware {
@@ -204,18 +188,6 @@ func (g *GroupRoute) Dispatch(c *Context) (err error) {
 			return
 		}
 	}
-
-	/*
-		// pop, dispatch last route
-		n := len(c.groupDispatch) - 1
-		route := c.groupDispatch[n]
-		c.groupDispatch = c.groupDispatch[:n]
-		err = route.Dispatch(c)
-		if err != nil {
-			g.endDispatch(c)
-			return
-		}
-	*/
 
 	// Dispatch matched route
 	err = c.Route.Dispatch(c)
@@ -297,14 +269,12 @@ func removeEmpty(parts []string) []string {
 // matches returns true if requestParts matches routeParts up through len(routeParts)
 // ignoring params in routeParts
 func matches(routeParts, requestParts []string) bool {
-	routeCount := len(routeParts)
-
 	// Check for catch-all wildcard
 	if len(routeParts) > 0 && routeParts[len(routeParts)-1] == "*" {
-		routeCount--
-	}
-
-	if len(requestParts) < routeCount {
+		if len(requestParts) < len(routeParts) - 1 {
+		    return false
+		}
+	} else if len(requestParts) < len(routeParts) {
 		return false
 	}
 
@@ -321,15 +291,3 @@ func matches(routeParts, requestParts []string) bool {
 
 	return true
 }
-
-/*
-// storeParams writes parts from requestParts that correspond with param names in
-// routeParts into c.Params.
-func storeParams(c *Context, routeParts, requestParts []string) {
-	for i, p := range routeParts {
-		if p[0] == ':' {
-			c.Params.Set(p[1:], requestParts[i])
-		}
-	}
-}
-*/
