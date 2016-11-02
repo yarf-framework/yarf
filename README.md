@@ -404,8 +404,8 @@ y.NotFound = func(c *yarf.Context) {
 ## Performance
 
 On initial benchmarks, the framework seems to perform very well compared with other similar frameworks. 
-Even when there are faster frameworks, under high load conditions and thanks to the route caching method, 
-YARF seems to perform as good or even better than the fastests that work better under simpler conditions.
+Even when some frameworks performs better under some conditions, by using the route caching method 
+YARF beats all other frameworks on the long run.
 
 Check the benchmarks repository to run your own:
 
