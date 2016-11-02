@@ -23,7 +23,6 @@ type ContextData interface {
 	Del(key string) error
 }
 
-
 // Params wraps a map[string]string and adds Get/Set/Del methods to work with it.
 // Inspired on url.Values but simpler as it doesn't handles a map[string][]string
 type Params map[string]string
@@ -46,7 +45,6 @@ func (p Params) Del(key string) {
 	delete(p, key)
 }
 
-
 // Context is the data/status storage of every YARF request.
 // Every request will instantiate a new Context object and fill in with all the request data.
 // Each request Context will be shared along the entire request life to ensure accesibility of its data at all levels.
@@ -62,8 +60,8 @@ type Context struct {
 
 	// Free storage to be used freely by apps to their convenience.
 	Data ContextData
-    
-    // Matched Router storage used on Dispatch methods.
+
+	// Matched Router storage used on Dispatch methods.
 	Route Router
 }
 
@@ -86,7 +84,7 @@ func (c *Context) Param(name string) string {
 	return c.Params.Get(name)
 }
 
-// StoreParams writes parts from requestParts that correspond with param names 
+// StoreParams writes parts from requestParts that correspond with param names
 // in routeParts into c.Params.
 func (c *Context) StoreParams(routeParts, requestParts []string) {
 	for i, p := range routeParts {

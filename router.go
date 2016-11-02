@@ -73,8 +73,8 @@ func (r *route) Match(url string, c *Context) bool {
 
 	// It matches. Store route into Context.
 	c.Route = r
-    
-    // Store params
+
+	// Store params
 	c.StoreParams(r.routeParts, requestParts)
 
 	return true
@@ -162,8 +162,8 @@ func (g *GroupRoute) Match(url string, c *Context) bool {
 	// Now look for a match inside the routes collection
 	for _, r := range g.routes {
 		if r.Match(rURL, c) {
-		    // Store group prefix params
-		    c.StoreParams(g.routeParts, urlParts)
+			// Store group prefix params
+			c.StoreParams(g.routeParts, urlParts)
 			return true
 		}
 	}
@@ -271,8 +271,8 @@ func removeEmpty(parts []string) []string {
 func matches(routeParts, requestParts []string) bool {
 	// Check for catch-all wildcard
 	if len(routeParts) > 0 && routeParts[len(routeParts)-1] == "*" {
-		if len(requestParts) < len(routeParts) - 1 {
-		    return false
+		if len(requestParts) < len(routeParts)-1 {
+			return false
 		}
 	} else if len(requestParts) < len(routeParts) {
 		return false
