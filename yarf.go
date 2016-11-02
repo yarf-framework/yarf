@@ -72,9 +72,12 @@ func (y *Yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	// Cached routes
 	if y.UseCache {
 		if cache, ok := y.cache.Get(req.URL.Path); ok {
-			// Set context params
-			c.Params = cache.params
-			c.groupDispatch = cache.route
+			/*
+				// Set context params
+				c.Params = cache.params
+				c.groupDispatch = cache.route
+			*/
+			c.Route = cache
 
 			// Dispatch and stop
 			err := y.Dispatch(c)
@@ -86,7 +89,8 @@ func (y *Yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	// Route match
 	if y.Match(req.URL.Path, c) {
 		if y.UseCache {
-			y.cache.Set(req.URL.Path, RouteCache{c.groupDispatch, c.Params})
+			//y.cache.Set(req.URL.Path, RouteCache{c.groupDispatch, c.Params})
+			y.cache.Set(req.URL.Path, c.Route)
 		}
 		err := y.Dispatch(c)
 		y.finish(c, err)

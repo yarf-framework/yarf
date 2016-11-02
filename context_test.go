@@ -48,6 +48,7 @@ func TestStatus(t *testing.T) {
 	}
 }
 
+/*
 func TestParam(t *testing.T) {
 	req, res := createRequestResponse()
 
@@ -58,6 +59,7 @@ func TestParam(t *testing.T) {
 		t.Errorf("Param 'name' set to '%s', '%s' retrieved.", "Joe", c.Param("name"))
 	}
 }
+*/
 
 func TestGetClientIP(t *testing.T) {
 	req, res := createRequestResponse()
@@ -160,6 +162,7 @@ func TestRenderXMLIndent(t *testing.T) {
 	}
 }
 
+/*
 func TestParams(t *testing.T) {
 	p := Params{}
 	key := "CHECK"
@@ -186,6 +189,7 @@ func TestParams(t *testing.T) {
 		t.Errorf("Expected to get an empty string for deleted %s key. But got %s", key, check)
 	}
 }
+*/
 
 func TestFormValue(t *testing.T) {
 	req, _ := http.NewRequest(

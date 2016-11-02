@@ -23,6 +23,7 @@ type ContextData interface {
 	Del(key string) error
 }
 
+/*
 // Params wraps a map[string]string and adds Get/Set/Del methods to work with it.
 // Inspired on url.Values but simpler as it doesn't handles a map[string][]string
 type Params map[string]string
@@ -44,6 +45,7 @@ func (p Params) Set(key, value string) {
 func (p Params) Del(key string) {
 	delete(p, key)
 }
+*/
 
 // Context is the data/status storage of every YARF request.
 // Every request will instantiate a new Context object and fill in with all the request data.
@@ -56,13 +58,15 @@ type Context struct {
 	Response http.ResponseWriter
 
 	// Parameters received through URL route
-	Params Params
+	//Params Params
 
 	// Free storage to be used freely by apps to their convenience.
 	Data ContextData
 
 	// Group route storage for dispatch
-	groupDispatch []Router
+	//groupDispatch []Router
+
+	Route Router
 }
 
 // NewContext creates a new *Context object with default values and returns it.
@@ -70,7 +74,7 @@ func NewContext(r *http.Request, rw http.ResponseWriter) *Context {
 	return &Context{
 		Request:  r,
 		Response: rw,
-		Params:   Params{},
+		//Params:   Params{},
 	}
 }
 
@@ -79,9 +83,34 @@ func (c *Context) Status(code int) {
 	c.Response.WriteHeader(code)
 }
 
+/*
 // Param is a wrapper for c.Params.Get()
 func (c *Context) Param(name string) string {
 	return c.Params.Get(name)
+}
+*/
+
+// Param matches route parameter names against the values in the request URL.
+func (c *Context) Param(name string) string {
+    /*
+	// Split route parts
+	route := strings.Split(c.Route.Path(), "/")
+
+	// Split request parts
+	req := strings.Split(c.Request.URL.Path, "/")
+
+	// Return the param match
+	for i, p := range route {
+	    if p != "" && len(p) > 1 {
+    		if p[0] == ':' && p[1:] == name {
+    			return req[i]
+    		}
+		}
+	}
+	*/
+    
+	return ""
+	
 }
 
 // FormValue is a wrapper for c.Request.Form.Get() and calls the c.Request.ParseForm().

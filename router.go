@@ -7,6 +7,7 @@ import (
 
 // Router interface provides the methods used to handle route and GroupRoute objects.
 type Router interface {
+	Path() string
 	Match(string, *Context) bool
 	Dispatch(*Context) error
 }
@@ -21,9 +22,11 @@ type GroupRouter interface {
 
 // route struct stores the expected route path and the ResourceHandler that handles that route.
 type route struct {
+	prefix string // Group route prefix, if any.
+
 	path string // Original route
 
-	routeParts []string // parsed Route split into parts
+	routeParts []string // Parsed Route split into parts
 
 	handler ResourceHandler // Handler for the route
 }
@@ -39,6 +42,11 @@ func Route(url string, h ResourceHandler) Router {
 		handler:    h,
 		routeParts: prepareURL(url),
 	}
+}
+
+// Path is a route.path getter.
+func (r *route) Path() string {
+	return r.prefix + r.path
 }
 
 // Match returns true/false indicating if a request URL matches the route and
@@ -63,7 +71,10 @@ func (r *route) Match(url string, c *Context) bool {
 		return false
 	}
 
-	storeParams(c, r.routeParts, requestParts)
+	// It matches. Store route into Context.
+	c.Route = r
+
+	//storeParams(c, r.routeParts, requestParts)
 
 	return true
 }
@@ -128,6 +139,11 @@ func RouteGroup(url string) *GroupRoute {
 	}
 }
 
+// Path is a g.prefix getter
+func (g *GroupRoute) Path() string {
+	return g.prefix
+}
+
 // Match loops through all routes inside the group and find for one that matches the request.
 // After a match is found, the route matching is stored into Context.groupDispatch
 // to being able to dispatch it directly after a match without looping again.
@@ -146,9 +162,15 @@ func (g *GroupRoute) Match(url string, c *Context) bool {
 	// Now look for a match inside the routes collection
 	for _, r := range g.routes {
 		if r.Match(rURL, c) {
-			// store the matching Router and params after a match is found
-			c.groupDispatch = append(c.groupDispatch, r)
-			storeParams(c, g.routeParts, urlParts)
+			/*
+				// store the matching Router and params after a match is found
+				c.groupDispatch = append(c.groupDispatch, r)
+				storeParams(c, g.routeParts, urlParts)
+			*/
+
+			// Store matching router into context
+			//c.Route = r it was stored on route match
+
 			return true
 		}
 	}
@@ -156,13 +178,22 @@ func (g *GroupRoute) Match(url string, c *Context) bool {
 	return false
 }
 
-// Dispatch loops through all routes inside the group and dispatch the one that matches the request.
+/*
+// Dispatch loops through all routes inside the group and dispatches the one that matches the request.
+*/
+// Dispatch takes the matched route stored in context and dispatches it.
 // Outside the box, works exactly the same as route.Dispatch().
 func (g *GroupRoute) Dispatch(c *Context) (err error) {
-	if len(c.groupDispatch) == 0 {
+	if c.Route == nil {
 		g.endDispatch(c)
 		return errors.New("No matching route found")
 	}
+	/*
+		if len(c.groupDispatch) == 0 {
+			g.endDispatch(c)
+			return errors.New("No matching route found")
+		}
+	*/
 
 	// Pre-dispatch middleware
 	for _, m := range g.middleware {
@@ -174,11 +205,20 @@ func (g *GroupRoute) Dispatch(c *Context) (err error) {
 		}
 	}
 
-	// pop, dispatch last route
-	n := len(c.groupDispatch) - 1
-	route := c.groupDispatch[n]
-	c.groupDispatch = c.groupDispatch[:n]
-	err = route.Dispatch(c)
+	/*
+		// pop, dispatch last route
+		n := len(c.groupDispatch) - 1
+		route := c.groupDispatch[n]
+		c.groupDispatch = c.groupDispatch[:n]
+		err = route.Dispatch(c)
+		if err != nil {
+			g.endDispatch(c)
+			return
+		}
+	*/
+
+	// Dispatch matched route
+	err = c.Route.Dispatch(c)
 	if err != nil {
 		g.endDispatch(c)
 		return
@@ -216,7 +256,12 @@ func (g *GroupRoute) endDispatch(c *Context) (err error) {
 
 // Add inserts a new resource with it's associated route into the group object.
 func (g *GroupRoute) Add(url string, h ResourceHandler) {
-	g.routes = append(g.routes, Route(url, h))
+	g.routes = append(g.routes, &route{
+		prefix:     g.prefix,
+		path:       url,
+		handler:    h,
+		routeParts: prepareURL(url),
+	})
 }
 
 // AddGroup inserts a GroupRoute into the routes list of the group object.
@@ -277,6 +322,7 @@ func matches(routeParts, requestParts []string) bool {
 	return true
 }
 
+/*
 // storeParams writes parts from requestParts that correspond with param names in
 // routeParts into c.Params.
 func storeParams(c *Context, routeParts, requestParts []string) {
@@ -286,3 +332,4 @@ func storeParams(c *Context, routeParts, requestParts []string) {
 		}
 	}
 }
+*/
