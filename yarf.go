@@ -6,7 +6,7 @@ import (
 )
 
 // Version string
-const Version = "0.8.0"
+const Version = "0.8.2"
 
 // Yarf is the main entry point for the framework and it centralizes most of the functionality.
 // All configuration actions are handled by this object.

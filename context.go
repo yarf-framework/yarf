@@ -132,6 +132,12 @@ func (c *Context) GetClientIP() (ip string) {
 	return strings.Split(ip, ":")[0]
 }
 
+// Redirect sends the corresponding HTTP redirect response with the provided URL and status code.
+// It's just a wrapper for net/http.Redirect()  
+func (c *Context) Redirect(url string, code int) {
+	http.Redirect(c.Response, c.Request, url, code)
+}
+
 // Render writes a string to the http.ResponseWriter.
 // This is the default renderer that just sends the string to the client.
 // Check other Render[Type] functions for different types.
