@@ -1,5 +1,6 @@
 [![GoDoc](https://godoc.org/github.com/yarf-framework/yarf?status.svg)](https://godoc.org/github.com/yarf-framework/yarf)
 [![Build Status](https://travis-ci.org/yarf-framework/yarf.svg?branch=master)](https://travis-ci.org/yarf-framework/yarf)
+[![Coverage Status](https://coveralls.io/repos/github/yarf-framework/yarf/badge.svg?branch=master)](https://coveralls.io/github/yarf-framework/yarf?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/yarf-framework/yarf)](https://goreportcard.com/report/github.com/yarf-framework/yarf)
 [![Join the chat at https://gitter.im/jinzhu/gorm](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/yarf-framework/yarf) 
 
@@ -8,16 +9,6 @@
 
 YARF is a fast micro-framework designed to build REST APIs and web services in a fast and simple way. 
 Designed after Go's composition features, takes a new approach to write simple and DRY code.
-
-
-## Documentation
-
-https://godoc.org/github.com/yarf-framework/yarf
-
-
-#### Test coverage
-
-https://gocover.io/github.com/yarf-framework/yarf
 
 
 ## Getting started
