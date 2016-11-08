@@ -1,4 +1,4 @@
-package middleware
+package main
 
 import (
 	"github.com/yarf-framework/yarf"
@@ -7,19 +7,14 @@ import (
 	"testing"
 )
 
-func TestHello(t *testing.T) {
+func TestResourceHello(t *testing.T) {
 	h := new(Hello)
 
 	c := new(yarf.Context)
 	c.Request, _ = http.NewRequest("GET", "/", nil)
 	c.Response = httptest.NewRecorder()
 
-	err := h.PreDispatch(c)
-	if err != nil {
-		t.Error(err.Error())
-	}
-
-	err = h.PostDispatch(c)
+	err := h.Get(c)
 	if err != nil {
 		t.Error(err.Error())
 	}

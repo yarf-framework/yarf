@@ -24,21 +24,3 @@ func TestHello(t *testing.T) {
 		t.Error(err.Error())
 	}
 }
-
-func TestExtra(t *testing.T) {
-	e := new(ExtraMiddleware)
-
-	c := new(yarf.Context)
-	c.Request, _ = http.NewRequest("GET", "/", nil)
-	c.Response = httptest.NewRecorder()
-
-	err := e.PreDispatch(c)
-	if err != nil {
-		t.Error(err.Error())
-	}
-
-	err = e.PostDispatch(c)
-	if err != nil {
-		t.Error(err.Error())
-	}
-}
