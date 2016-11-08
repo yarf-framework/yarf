@@ -88,11 +88,16 @@ func (c *Context) Param(name string) string {
 	return c.Params.Get(name)
 }
 
-// FormValue is a wrapper for c.Request.Form.Get() and calls the c.Request.ParseForm().
+// FormValue is a wrapper for c.Request.Form.Get() and it calls c.Request.ParseForm().
 func (c *Context) FormValue(name string) string {
 	c.Request.ParseForm()
 
 	return c.Request.Form.Get(name)
+}
+
+// QueryValue is a wrapper for c.Request.URL.Query().Get().
+func (c *Context) QueryValue(name string) string {
+	return c.Request.URL.Query().Get(name)
 }
 
 // GetClientIP retrieves the client IP address from the request information.
@@ -133,7 +138,7 @@ func (c *Context) GetClientIP() (ip string) {
 }
 
 // Redirect sends the corresponding HTTP redirect response with the provided URL and status code.
-// It's just a wrapper for net/http.Redirect()  
+// It's just a wrapper for net/http.Redirect()
 func (c *Context) Redirect(url string, code int) {
 	http.Redirect(c.Response, c.Request, url, code)
 }
