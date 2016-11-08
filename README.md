@@ -1,4 +1,5 @@
 [![GoDoc](https://godoc.org/github.com/yarf-framework/yarf?status.svg)](https://godoc.org/github.com/yarf-framework/yarf)
+[![Version](https://badge.fury.io/gh/yarf-framework%2Fyarf.svg)](https://badge.fury.io/gh/yarf-framework%2Fyarf)
 [![Build Status](https://travis-ci.org/yarf-framework/yarf.svg?branch=master)](https://travis-ci.org/yarf-framework/yarf)
 [![Coverage Status](https://coveralls.io/repos/github/yarf-framework/yarf/badge.svg?branch=master)](https://coveralls.io/github/yarf-framework/yarf?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/yarf-framework/yarf)](https://goreportcard.com/report/github.com/yarf-framework/yarf)
