@@ -116,11 +116,17 @@ func (y *Yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 func (y *Yarf) finish(c *Context, err error) {
 	// If a logger is present, lets log everything.
 	if y.Logger != nil {
+	    req := "http"
+	    if c.Request.TLS != nil {
+	        req += "s"
+	    }
+	    req += "://" + c.Request.Host + c.Request.URL.String()
+	    
 		y.Logger.Printf(
 			"%s | %s | %s ",
 			c.GetClientIP(),
 			c.Request.Method,
-			c.Request.URL.String(),
+			req,
 		)
 	}
 
