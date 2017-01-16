@@ -1,6 +1,7 @@
 package yarf
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -116,17 +117,35 @@ func (y *Yarf) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 func (y *Yarf) finish(c *Context, err error) {
 	// If a logger is present, lets log everything.
 	if y.Logger != nil {
-	    req := "http"
-	    if c.Request.TLS != nil {
-	        req += "s"
-	    }
-	    req += "://" + c.Request.Host + c.Request.URL.String()
-	    
+		// Construct request host string
+		req := "http"
+		if c.Request.TLS != nil {
+			req += "s"
+		}
+		req += "://" + c.Request.Host + c.Request.URL.String()
+
+		// Check for errors
+		errorMsg := "OK"
+		if err != nil {
+			yerr, ok := err.(YError)
+			if ok {
+				if yerr.Code() == 404 && y.NotFound != nil {
+					errorMsg = "FOLLOW NotFound"
+				} else {
+					errorMsg = fmt.Sprintf("ERROR: %d - %s | %s", yerr.Code(), yerr.Body(), yerr.Msg())
+				}
+			} else {
+				errorMsg = "ERROR: " + err.Error()
+			}
+		}
+
 		y.Logger.Printf(
-			"%s | %s | %s ",
+			"%s - %s | %s | %s => %s",
 			c.GetClientIP(),
+			c.Request.UserAgent(),
 			c.Request.Method,
 			req,
+			errorMsg,
 		)
 	}
 
@@ -151,17 +170,6 @@ func (y *Yarf) finish(c *Context, err error) {
 	if yerr.Code() == 404 && y.NotFound != nil {
 		y.NotFound(c)
 		return
-	}
-
-	// Log errors
-	if y.Logger != nil {
-		y.Logger.Printf(
-			"%s | ERROR: %d | %s | %s",
-			c.GetClientIP(),
-			yerr.Code(),
-			yerr.Body(),
-			yerr.Msg(),
-		)
 	}
 
 	// Write error data to response.
