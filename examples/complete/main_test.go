@@ -2,6 +2,7 @@ package main
 
 import (
 	"testing"
+	"net/http"
 )
 
 func TestMain(t *testing.T) {

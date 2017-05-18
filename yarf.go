@@ -19,10 +19,6 @@ type Yarf struct {
 	// On debug mode, extra error information is sent to the client.
 	Debug bool
 
-	// Silent mode attempts to prevent all messages that aren't part of a resource response to get to the client.
-	// Specially useful to hide error messages.
-	Silent bool
-
 	// PanicHandler can store a func() that will be defered by each request to be able to recover().
 	// If you need to log, send information or do anything about a panic, this is your place.
 	PanicHandler func()
@@ -148,9 +144,9 @@ func (y *Yarf) finish(c *Context, err error) {
 			errorMsg,
 		)
 	}
-
-	// Return if no error or silent mode
-	if err == nil || y.Silent {
+	
+	// Return if no error
+	if err == nil {
 		return
 	}
 
@@ -171,7 +167,7 @@ func (y *Yarf) finish(c *Context, err error) {
 		y.NotFound(c)
 		return
 	}
-
+	
 	// Write error data to response.
 	c.Response.WriteHeader(yerr.Code())
 

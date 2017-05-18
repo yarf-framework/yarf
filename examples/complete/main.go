@@ -35,6 +35,6 @@ func main() {
 	// Add logger middleware at the end of the chain
 	y.Insert(new(logger.Logger))
 
-	// Start server listening on port 8080
+	// Start server listening on port 8088
 	y.Start(":8080")
 }
