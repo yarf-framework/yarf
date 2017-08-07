@@ -1,6 +1,7 @@
 package yarf
 
 import (
+	"compress/gzip"
 	"encoding/json"
 	"encoding/xml"
 	"net/http"
@@ -151,6 +152,32 @@ func (c *Context) Render(content string) {
 	c.Response.Write([]byte(content))
 }
 
+// RenderGzip takes a []byte content and if the client accepts compressed responses,
+// writes the compressed version of the content to the response.
+// Otherwise it just writes the plain []byte to it.
+func (c *Context) RenderGzip(content []byte) error {
+	// Check if client accepts compression
+	if !strings.Contains(c.Request.Header.Get("Accept-Encoding"), "gzip") {
+		c.Response.Write(content)
+		return nil
+	}
+
+	// Detect content type
+	c.Response.Header().Set("Content-Type", http.DetectContentType(content))
+
+	// Write compressed content
+	gz := gzip.NewWriter(c.Response)
+	defer gz.Close()
+
+	c.Response.Header().Set("Content-Encoding", "gzip")
+	c.Response.Header().Set("Vary", "Accept-Encoding")
+	c.Response.Header().Del("Content-Length")
+
+	gz.Write(content)
+
+	return nil
+}
+
 // RenderJSON takes a interface{} object and writes the JSON encoded string of it.
 func (c *Context) RenderJSON(data interface{}) {
 	// Set content
@@ -173,6 +200,17 @@ func (c *Context) RenderJSONIndent(data interface{}) {
 	}
 }
 
+// RenderGzipJSON takes a interface{} object and writes the JSON verion through RenderGzip.
+func (c *Context) RenderGzipJSON(data interface{}) {
+	// Create JSON content
+	encoded, err := json.Marshal(data)
+	if err != nil {
+		c.Response.Write([]byte(err.Error()))
+	}
+
+	c.RenderGzip(encoded)
+}
+
 // RenderXML takes a interface{} object and writes the XML encoded string of it.
 func (c *Context) RenderXML(data interface{}) {
 	// Set content
@@ -193,4 +231,15 @@ func (c *Context) RenderXMLIndent(data interface{}) {
 	} else {
 		c.Response.Write(encoded)
 	}
+}
+
+// RenderGzipXML takes a interface{} object and writes the XML verion through RenderGzip.
+func (c *Context) RenderGzipXML(data interface{}) {
+	// Set XML content
+	encoded, err := xml.Marshal(data)
+	if err != nil {
+		c.Response.Write([]byte(err.Error()))
+	}
+
+	c.RenderGzip(encoded)
 }

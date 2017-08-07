@@ -144,7 +144,7 @@ func (y *Yarf) finish(c *Context, err error) {
 			errorMsg,
 		)
 	}
-	
+
 	// Return if no error
 	if err == nil {
 		return
@@ -167,7 +167,7 @@ func (y *Yarf) finish(c *Context, err error) {
 		y.NotFound(c)
 		return
 	}
-	
+
 	// Write error data to response.
 	c.Response.WriteHeader(yerr.Code())
 
