@@ -170,11 +170,7 @@ func (y *Yarf) finish(c *Context, err error) {
 
 	// Write error data to response.
 	c.Response.WriteHeader(yerr.Code())
-
-	// Render errors if debug enabled
-	if y.Debug {
-		c.Render(yerr.Body())
-	}
+	c.Render(yerr.Body())
 }
 
 // Start initiates a new http yarf server and start listening.
